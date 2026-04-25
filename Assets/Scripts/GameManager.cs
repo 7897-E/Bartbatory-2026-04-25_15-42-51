@@ -29,7 +29,7 @@ public class GameManager : MonoBehaviour
         BoardManager.Init();
         PlayerController.Spawn(BoardManager, new Vector2Int(80, 1));
         StartCoroutine(SpawnEnemiesLoop());
-   
+        upgrades.ShowRandomUpgrades();
     }
 
     private IEnumerator SpawnEnemiesLoop()

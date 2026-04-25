@@ -13,6 +13,9 @@ public class BatScript : MonoBehaviour
     public float fireRate = 0.3f;
     private float fireCooldown = 0f;
     public int damage;
+    [Header("Bullet")]
+    public float bulletSpeed = 10f;
+    public int MaxHits = 1;
     public BulletScript bulletPrefab;
 
     [Header("Swing")]
@@ -111,7 +114,7 @@ public class BatScript : MonoBehaviour
             rot
         );
 
-        bullet.Init(dir, damage);
+        bullet.Init(dir, damage, bulletSpeed, MaxHits);
         if (fireCooldown >= .175)
         {
             StartSwing(targetPos);

@@ -435,6 +435,8 @@ MonoBehaviour:
   rotationSpeed: 720
   fireRate: 0.3
   damage: 5
+  bulletSpeed: 10
+  MaxHits: 1
   bulletPrefab: {fileID: 1119474578717078021, guid: ab824bd58869d55429ac17fe1fa2dede, type: 3}
   swingAngle: 60
   swingDuration: 0.15
@@ -475,7 +477,7 @@ MonoBehaviour:
   upgrades: {fileID: 1188654722}
   spawnInterval: 0.5
   offscreenMargin: 5
-  Scaling: 1
+  Scaling: 5
 --- !u!4 &272732160
 Transform:
   m_ObjectHideFlags: 0
@@ -960,11 +962,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uiDocument: {fileID: 1188654720}
-  cardTemplate: {fileID: 9197481963319205126, guid: 05a3b3598ac238449abe904c52212b1f, type: 3}
+  cardTemplate: {fileID: 9197481963319205126, guid: 6317611064a8e2940a8b7bc3096980e3, type: 3}
   allUpgrades:
-  - {fileID: 11400000, guid: 693ba583f7e912e4891f73d7fc9a5c0a, type: 2}
+  - {fileID: 11400000, guid: e6e919bdaa05de84e97cd902ecc8ab97, type: 2}
+  - {fileID: 11400000, guid: 4781fe90ad750f24183f320ca2d75b95, type: 2}
+  - {fileID: 11400000, guid: 2b12ef73a48fe0347b58b45808efc475, type: 2}
   - {fileID: 11400000, guid: 63af240f5662e424aa012b2f46ad0c4f, type: 2}
-  choicesPerLevel: 1
+  - {fileID: 11400000, guid: e458d9d55a39b8e489d439e98d7b865f, type: 2}
+  - {fileID: 11400000, guid: 693ba583f7e912e4891f73d7fc9a5c0a, type: 2}
+  - {fileID: 11400000, guid: d651d5416bd95004a981d4a459e38810, type: 2}
+  choicesPerLevel: 3
+  PlayerController: {fileID: 159124794}
+  BatScript: {fileID: 209923382}
 --- !u!1 &1706989325
 GameObject:
   m_ObjectHideFlags: 0
@@ -1068,7 +1077,7 @@ MonoBehaviour:
   m_PanelSettings: {fileID: 11400000, guid: 997497c16e9233a4eb412748d4996065, type: 2}
   m_ParentUI: {fileID: 0}
   sourceAsset: {fileID: 9197481963319205126, guid: 3156fad1e9654364e82ee915652c8b34, type: 3}
-  m_SortingOrder: 13
+  m_SortingOrder: 11
 --- !u!4 &2114047225
 Transform:
   m_ObjectHideFlags: 0

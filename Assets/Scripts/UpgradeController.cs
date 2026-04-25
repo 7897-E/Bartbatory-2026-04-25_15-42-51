@@ -8,10 +8,14 @@ public class UpgradeUIController : MonoBehaviour
     public UIDocument uiDocument;          // points to UpgradeUI.uxml
     public VisualTreeAsset cardTemplate;   // points to UpgradeCard.uxml
 
+
     [Header("Upgrades")]
     public Upgrades[] allUpgrades;
     public int choicesPerLevel = 3;
 
+    [Header("References")]
+    public PlayerController PlayerController;
+    public BatScript BatScript;
     private VisualElement root;
     private VisualElement cardsContainer;
 
@@ -71,7 +75,7 @@ public class UpgradeUIController : MonoBehaviour
 
         foreach (var upgrade in currentChoices)
         {
-            Debug.LogWarning("Yes");
+            
             CreateCard(upgrade);
         }
 
@@ -104,9 +108,8 @@ public class UpgradeUIController : MonoBehaviour
         if (button != null)
         {
             button.text = "Select";
-
-            // Clear previous callbacks, then add new
             button.clicked += () => OnUpgradeSelected(data);
+            
         }
 
         cardsContainer.Add(card);
@@ -116,9 +119,9 @@ public class UpgradeUIController : MonoBehaviour
     private void OnUpgradeSelected(Upgrades data)
     {
         Debug.Log($"Selected upgrade: {data.upgradeName}");
-
+        data.Apply(PlayerController, BatScript);
         Hide();
-        Time.timeScale = 1f; // unpause
+        Time.timeScale = 1f;
     }
 
     private void ClearCards()

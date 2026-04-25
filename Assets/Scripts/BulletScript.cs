@@ -2,22 +2,22 @@ using UnityEngine;
 
 public class BulletScript : MonoBehaviour
 {
-    public float speed = 10f;
-    public float lifeTime = 3f;
-    public int damage = 1;
+    private float speed = 10f;
+    private int damage = 1;
+    private int maxHits = 1;   
+    private int currentHits = 0;
 
     private Vector3 _direction = Vector3.up; 
 
-    public void Init(Vector3 direction, int damages)
+    public void Init(Vector3 direction, int damages, float speed,  int maxHits)
     {
         _direction = direction.normalized;
         damage = damages;
+        this.speed = speed;
+        this.maxHits = maxHits;
     }
 
-    private void Start()
-    {
-        Destroy(gameObject, lifeTime);
-    }
+   
 
     private void Update()
     {
@@ -30,9 +30,13 @@ public class BulletScript : MonoBehaviour
         if (enemy != null)
         {
             enemy.TakeDamage(damage);
-            
+            currentHits++;
 
-            Destroy(gameObject);
+            if (currentHits >= maxHits)
+            {
+                Destroy(gameObject);
+            }
         }
+        
     }
 }

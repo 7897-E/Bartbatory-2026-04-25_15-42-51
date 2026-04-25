@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 04d722b645db23e4fa422492040f6e38, type: 3}
-  m_Name: HealthUP
+  m_Name: MaxHits
   m_EditorClassIdentifier: 
-  upgradeName: MaxHealth
-  description: Increases Max Health
+  upgradeName: MaxHits
+  description: Increases piercing
   changes:
-  - attribute: 2
-    changeType: 1
-    value: 2
+  - attribute: 6
+    changeType: 0
+    value: 1

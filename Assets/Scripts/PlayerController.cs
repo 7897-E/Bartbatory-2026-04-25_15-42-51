@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour
     private MapGeneration m_Board;
     private Vector2Int m_CellPosition;
 
-    [SerializeField] private float moveSpeed = 5f; // higher = faster movement
+    public float moveSpeed = 5f; 
 
     private Vector3 m_TargetWorldPos;
     private bool m_IsMoving = false;
