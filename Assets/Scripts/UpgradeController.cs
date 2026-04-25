@@ -5,9 +5,8 @@ using UnityEngine.UIElements;
 public class UpgradeUIController : MonoBehaviour
 {
     [Header("UI Toolkit")]
-    public UIDocument uiDocument;          // points to UpgradeUI.uxml
-    public VisualTreeAsset cardTemplate;   // points to UpgradeCard.uxml
-
+    public UIDocument uiDocument;
+    public VisualTreeAsset cardTemplate;
 
     [Header("Upgrades")]
     public Upgrades[] allUpgrades;
@@ -16,11 +15,13 @@ public class UpgradeUIController : MonoBehaviour
     [Header("References")]
     public PlayerController PlayerController;
     public BatScript BatScript;
+
     private VisualElement root;
     private VisualElement cardsContainer;
 
-    private readonly List<Upgrades> currentChoices = new List<Upgrades>();
-    private readonly List<VisualElement> spawnedCards = new List<VisualElement>();
+    private readonly List<Upgrades> currentChoices = new();
+    private readonly List<VisualElement> spawnedCards = new();
+    private readonly Dictionary<Button, VisualElement> dropdownPanels = new();
 
     private void Awake()
     {
@@ -31,9 +32,7 @@ public class UpgradeUIController : MonoBehaviour
         cardsContainer = root.Q<VisualElement>("cards-container");
 
         if (cardsContainer == null)
-        {
             Debug.LogError("cards-container not found in UpgradeUI.uxml");
-        }
 
         Hide();
     }
@@ -42,106 +41,163 @@ public class UpgradeUIController : MonoBehaviour
     {
         if (allUpgrades == null || allUpgrades.Length == 0)
         {
-            Debug.LogWarning("No upgrades assigned to UpgradeUIController");
+            Debug.LogWarning("No upgrades assigned.");
             return;
         }
 
         ClearCards();
         currentChoices.Clear();
+
         int count = Mathf.Min(choicesPerLevel, allUpgrades.Length);
-        var used = new HashSet<int>();
-        
+        HashSet<int> usedIndexes = new();
 
         for (int i = 0; i < count; i++)
         {
             int index;
+
             do
             {
                 index = Random.Range(0, allUpgrades.Length);
-            } while (used.Contains(index));
+            }
+            while (usedIndexes.Contains(index));
 
-            used.Add(index);
+            usedIndexes.Add(index);
             currentChoices.Add(allUpgrades[index]);
         }
+
         Show();
-        // Instantiate cards from template
-        Debug.Log($"currentChoices is null? {currentChoices == null}");
 
-        if (currentChoices == null || currentChoices.Count == 0)
+        foreach (Upgrades upgrade in currentChoices)
         {
-            Debug.LogWarning("currentChoices is null or empty before foreach");
-            return; // or handle however you want
-        }
-
-        foreach (var upgrade in currentChoices)
-        {
-            
             CreateCard(upgrade);
         }
 
+        MatchCardSizes();
 
-        Time.timeScale = 0f; 
+        Time.timeScale = 0f;
     }
 
     private void CreateCard(Upgrades data)
     {
         if (cardTemplate == null)
         {
-            Debug.LogError("Card template (VisualTreeAsset) is not assigned.");
+            Debug.LogError("Card template not assigned.");
             return;
         }
 
         VisualElement card = cardTemplate.Instantiate();
+        card.AddToClassList("upgrade-card-container");
 
-        card.AddToClassList("upgrade-card-instance");
-
-        Label titleLabel = card.Q<Label>("card-title");
-        Label descLabel = card.Q<Label>("card-description");
         Button button = card.Q<Button>("card-button");
+        VisualElement descriptionPanel = card.Q<VisualElement>("description-panel");
+        Label descriptionText = card.Q<Label>("description-text");
 
-        if (titleLabel != null)
-            titleLabel.text = data.upgradeName;
-
-        if (descLabel != null)
-            descLabel.text = data.description;
-
-        if (button != null)
+        if (button == null)
         {
-            button.text = "Select";
-            button.clicked += () => OnUpgradeSelected(data);
-            
+            Debug.LogError("card-button not found in card template.");
+            return;
         }
+
+        if (descriptionPanel == null)
+        {
+            Debug.LogError("description-panel not found in card template.");
+            return;
+        }
+
+        if (descriptionText == null)
+        {
+            Debug.LogError("description-text not found in card template.");
+            return;
+        }
+
+        button.text = data.upgradeName;
+        descriptionText.text = data.description;
+
+        descriptionPanel.style.display = DisplayStyle.None;
+
+        dropdownPanels[button] = descriptionPanel;
+
+        button.clicked += () => OnUpgradeSelected(data);
+
+        button.RegisterCallback<MouseEnterEvent>(_ => ShowDropdown(button));
+        button.RegisterCallback<MouseLeaveEvent>(_ => HideDropdown(button));
+
+        descriptionPanel.RegisterCallback<MouseEnterEvent>(_ => ShowDropdown(button));
+        descriptionPanel.RegisterCallback<MouseLeaveEvent>(_ => HideDropdown(button));
 
         cardsContainer.Add(card);
         spawnedCards.Add(card);
     }
 
+    private void ShowDropdown(Button button)
+    {
+        if (dropdownPanels.TryGetValue(button, out VisualElement panel))
+        {
+            panel.style.display = DisplayStyle.Flex;
+        }
+    }
+
+    private void HideDropdown(Button button)
+    {
+        if (dropdownPanels.TryGetValue(button, out VisualElement panel))
+        {
+            panel.style.display = DisplayStyle.None;
+        }
+    }
+
+    private void MatchCardSizes()
+    {
+        if (spawnedCards.Count == 0)
+            return;
+
+        root.schedule.Execute(() =>
+        {
+            float maxWidth = 0f;
+            float maxHeight = 0f;
+
+            foreach (VisualElement card in spawnedCards)
+            {
+                maxWidth = Mathf.Max(maxWidth, card.layout.width);
+                maxHeight = Mathf.Max(maxHeight, card.layout.height);
+            }
+
+            foreach (VisualElement card in spawnedCards)
+            {
+                card.style.width = maxWidth;
+                card.style.minHeight = maxHeight;
+            }
+        }).StartingIn(0);
+    }
+
     private void OnUpgradeSelected(Upgrades data)
     {
-        Debug.Log($"Selected upgrade: {data.upgradeName}");
+        Debug.Log($"Selected: {data.upgradeName}");
+
         data.Apply(PlayerController, BatScript);
+
         Hide();
+
         Time.timeScale = 1f;
     }
 
     private void ClearCards()
     {
-        foreach (var card in spawnedCards)
+        foreach (VisualElement card in spawnedCards)
         {
             cardsContainer.Remove(card);
         }
+
         spawnedCards.Clear();
+        dropdownPanels.Clear();
     }
 
     public void Show()
     {
-        if (root != null)
-            root.style.display = DisplayStyle.Flex;
+        root.style.display = DisplayStyle.Flex;
     }
 
     public void Hide()
     {
-        if (root != null)
-            root.style.display = DisplayStyle.None;
+        root.style.display = DisplayStyle.None;
     }
 }
