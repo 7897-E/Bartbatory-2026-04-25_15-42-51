@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="Root" style="flex-grow: 1; flex-direction: column; justify-content: center; align-self: center; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.55);">
+        <ui:Label tabindex="-1" text="Choose An Upgrade" parse-escape-sequences="true" display-tooltip-when-elided="true" name="TitleLabel" style="align-items: center; align-self: center; font-size: 30px; color: rgb(202, 202, 202);" />
+        <ui:VisualElement name="CardsContainer" style="flex-grow: 1; flex-direction: row; justify-content: center; align-self: stretch; margin-top: 20px; margin-right: 20px; margin-bottom: 20px; margin-left: 20px;" />
+    </ui:VisualElement>
+</ui:UXML>

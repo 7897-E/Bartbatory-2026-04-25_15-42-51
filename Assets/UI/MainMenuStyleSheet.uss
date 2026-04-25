@@ -1,0 +1,49 @@
+.MMButton {
+    opacity: 1;
+    width: 692px;
+    height: 120px;
+    align-items: auto;
+    align-self: center;
+    -unity-font: url("project://database/Assets/UI/determination.ttf?fileID=12800000&guid=6468eb49ccd77b8479679ca6ee2e018b&type=3#determination");
+    -unity-font-definition: initial;
+    background-color: rgb(255, 255, 255);
+    border-top-width: 3px;
+    border-right-width: 3px;
+    border-bottom-width: 3px;
+    border-left-width: 3px;
+    border-left-color: rgb(108, 164, 100);
+    border-right-color: rgb(108, 164, 100);
+    border-top-color: rgb(108, 164, 100);
+    border-bottom-color: rgb(108, 164, 100);
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+    border-bottom-right-radius: 7px;
+    border-bottom-left-radius: 7px;
+    scale: 1 1;
+    font-size: 25px;
+    color: rgb(91, 91, 91);
+    -unity-text-outline-color: rgb(57, 103, 54);
+    -unity-text-outline-width: -20px;
+    text-shadow: 2px 2px 3px rgba(40, 140, 26, 0.52);
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    margin-top: 25px;
+    margin-right: 25px;
+    margin-bottom: 25px;
+    margin-left: 25px;
+}
+
+.MMButton:hover {
+    scale: 1.05 1.1;
+}
+
+.menu-root {
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+.menu-root.fade-out {
+    opacity: 0;
+}
