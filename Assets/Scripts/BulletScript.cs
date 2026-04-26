@@ -1,3 +1,4 @@
+using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 
 public class BulletScript : MonoBehaviour
@@ -7,22 +8,36 @@ public class BulletScript : MonoBehaviour
     private int maxHits = 1;   
     private int currentHits = 0;
 
+    private Camera cam;
+    private float destroyDistance = .5f;
     private Vector3 _direction = Vector3.up; 
 
-    public void Init(Vector3 direction, int damages, float speed,  int maxHits)
+    public void Init(Vector3 direction, int damages, float speed,  int maxHits, Camera camera)
     {
         _direction = direction.normalized;
         damage = damages;
         this.speed = speed;
         this.maxHits = maxHits;
+        cam = camera;
     }
 
-   
+    private void OnBecameInvisible()
+    {
+        Destroy(gameObject);
+    }
 
     private void Update()
+{
+    transform.position += _direction * speed * Time.deltaTime;
+
+    Vector3 viewportPos = cam.WorldToViewportPoint(transform.position);
+
+    if (viewportPos.x < -destroyDistance || viewportPos.x > 1 + destroyDistance ||
+        viewportPos.y < -destroyDistance || viewportPos.y > 1 + destroyDistance)
     {
-        transform.position += _direction * speed * Time.deltaTime;
+        Destroy(gameObject);
     }
+}
 
     private void OnTriggerEnter2D(Collider2D other)
     {

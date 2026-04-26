@@ -26,6 +26,7 @@ public class PlayerUI : MonoBehaviour
             displayedHealth = player.currentHealth;
             displayedXP = player.currentXP;
         }
+        
     }
 
     private void Update()
@@ -40,7 +41,6 @@ public class PlayerUI : MonoBehaviour
             healthBar.lowValue = 0;
             healthBar.highValue = player.maxHealth;
             healthBar.value = displayedHealth;
-            healthBar.title = $"{player.currentHealth} / {player.maxHealth}";
         }
 
         if (xpBar != null)
@@ -48,7 +48,6 @@ public class PlayerUI : MonoBehaviour
             xpBar.lowValue = 0;
             xpBar.highValue = player.maxXP;
             xpBar.value = displayedXP;
-            xpBar.title = $"{player.currentXP} / {player.maxXP}";
         }
     }
 }

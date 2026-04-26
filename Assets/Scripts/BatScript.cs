@@ -17,6 +17,7 @@ public class BatScript : MonoBehaviour
     public float bulletSpeed = 10f;
     public int MaxHits = 1;
     public BulletScript bulletPrefab;
+    public Camera cam;
 
     [Header("Swing")]
     public float swingAngle = 90f;
@@ -114,7 +115,7 @@ public class BatScript : MonoBehaviour
             rot
         );
 
-        bullet.Init(dir, damage, bulletSpeed, MaxHits);
+        bullet.Init(dir, damage, bulletSpeed, MaxHits, cam);
         if (fireCooldown >= .175)
         {
             StartSwing(targetPos);

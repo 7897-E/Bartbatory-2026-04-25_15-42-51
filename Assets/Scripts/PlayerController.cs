@@ -238,8 +238,6 @@ public class PlayerController : MonoBehaviour
         }
 
         UpdateBarLimits();
-
-        Debug.Log($"Player took {amount} damage. Health = {currentHealth}");
     }
 
     public void AddXP(int amount)
@@ -257,15 +255,11 @@ public class PlayerController : MonoBehaviour
 
     private void LevelUp()
     {
-        Debug.Log("Level up!");
-
-        maxHealth += 5;
         currentHealth = maxHealth;
 
-        maxXP += 50;
+        maxXP += (maxXP + (int)(maxXP * 0.3));
         upgrades.ShowRandomUpgrades();
         UpdateBarLimits();
-
     }
 
     private void Die()

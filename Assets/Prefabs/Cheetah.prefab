@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1135224993198769658}
   - component: {fileID: 2806484646536697745}
   m_Layer: 0
-  m_Name: Capsule
+  m_Name: Cheetah
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -76,7 +76,7 @@ SpriteRenderer:
   m_SortingLayerID: 1239855529
   m_SortingLayer: 1
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300012, guid: fbe1e7b94bb1a4a099d5bcb15a00141c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 83996537826465f4a8339ef225e8898f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -107,6 +107,10 @@ MonoBehaviour:
   cooldown: 2
   maxHealth: 10
   currentHealth: 0
+  upSprite: {fileID: 21300000, guid: dccbdd48c795ab6439776c5981106519, type: 3}
+  downSprite: {fileID: 21300000, guid: 83996537826465f4a8339ef225e8898f, type: 3}
+  leftSprite: {fileID: 21300000, guid: dccbdd48c795ab6439776c5981106519, type: 3}
+  rightSprite: {fileID: 21300000, guid: 2e7c53646e9a0ab4dba8ca3598a9ded0, type: 3}
 --- !u!50 &1135224993198769658
 Rigidbody2D:
   serializedVersion: 4

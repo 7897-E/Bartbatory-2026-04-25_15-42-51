@@ -321,8 +321,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25f855ec56abce642823a7cda97cda23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyPrefab: {fileID: 5766218416977274176, guid: 63df890f87342d44abf060f2c509cecf, type: 3}
+  ZombPrefab: {fileID: 5766218416977274176, guid: 63df890f87342d44abf060f2c509cecf, type: 3}
   ZombHealth: 10
+  ZombfollowSpeed: 0.5
+  Zombdamage: 1
+  ZombCooldown: 2
+  CheetahPrefab: {fileID: 5766218416977274176, guid: c235857aea694074c8845cec475e074e, type: 3}
+  CheetahHealth: 5
+  CheetahfollowSpeed: 1
+  Cheetahdamage: 2
+  CheetahCooldown: 1
 --- !u!4 &168171034
 Transform:
   m_ObjectHideFlags: 0
@@ -443,6 +451,7 @@ MonoBehaviour:
   bulletSpeed: 10
   MaxHits: 1
   bulletPrefab: {fileID: 1119474578717078021, guid: ab824bd58869d55429ac17fe1fa2dede, type: 3}
+  cam: {fileID: 519420031}
   swingAngle: 60
   swingDuration: 0.15
   rightOffset: {x: 0.5, y: 0, z: 0}
@@ -482,7 +491,7 @@ MonoBehaviour:
   upgrades: {fileID: 1188654722}
   spawnInterval: 0.5
   offscreenMargin: 5
-  Scaling: 5
+  Scaling: 25
 --- !u!4 &272732160
 Transform:
   m_ObjectHideFlags: 0

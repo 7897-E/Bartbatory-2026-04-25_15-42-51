@@ -1,0 +1,36 @@
+#HealthBar,
+#XPBar {
+    height: 18px;
+    border-radius: 9px;
+    overflow: hidden;
+    border-width: 2px;
+    border-color: #111;
+}
+
+/* Hide text */
+#HealthBar .unity-progress-bar__title,
+#XPBar .unity-progress-bar__title {
+    display: none;
+}
+
+/* Health */
+#HealthBar .unity-progress-bar__background {
+    background-color: #3a1f1f;
+    border-radius: 9px;
+}
+
+#HealthBar .unity-progress-bar__progress {
+    background-color: #d83a3a;
+    border-radius: 9px;
+}
+
+/* XP */
+#XPBar .unity-progress-bar__background {
+    background-color: #242424;
+    border-radius: 9px;
+}
+
+#XPBar .unity-progress-bar__progress {
+    background-color: #9a9a9a;
+    border-radius: 9px;
+}

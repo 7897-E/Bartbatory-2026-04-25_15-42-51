@@ -45,7 +45,8 @@ public class GameManager : MonoBehaviour
             if (count == Scaling && spawnInterval >=0) { spawnInterval -= 0.1f; count = 0; Scaling += Scaling + (int)(Scaling * .5);  }
             if(spawnInterval < 0) { spawnInterval = 0; }
             Vector3 spawnPos = GetOffscreenSpawnPosition();
-            enemySpawner.SpawnEnemy(BoardManager, PlayerController.transform, spawnPos, PlayerController);
+            enemySpawner.SpawnZomb(BoardManager, PlayerController.transform, spawnPos, PlayerController);
+            enemySpawner.SpawnCheetah(BoardManager, PlayerController.transform, spawnPos, PlayerController);
             count++;
         }
     }
