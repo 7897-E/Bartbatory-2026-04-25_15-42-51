@@ -1,4 +1,3 @@
-using UnityEditor.Rendering.LookDev;
 using UnityEngine;
 
 public class BulletScript : MonoBehaviour
@@ -8,19 +7,21 @@ public class BulletScript : MonoBehaviour
     private int maxHits = 1;   
     private int currentHits = 0;
 
+    private int bouncesLeft = 0;
+
     private Camera cam;
     private float destroyDistance = .5f;
     private Vector3 _direction = Vector3.up; 
 
-    public void Init(Vector3 direction, int damages, float speed,  int maxHits, Camera camera)
+    public void Init(Vector3 direction, int damages, float speed, int maxHits, int bounces, Camera camera)
     {
         _direction = direction.normalized;
         damage = damages;
         this.speed = speed;
         this.maxHits = maxHits;
+        bouncesLeft = bounces;
         cam = camera;
     }
-
     private void OnBecameInvisible()
     {
         Destroy(gameObject);
@@ -42,16 +43,25 @@ public class BulletScript : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         EnemyScript enemy = other.GetComponent<EnemyScript>();
+
         if (enemy != null)
         {
             enemy.TakeDamage(damage);
-            currentHits++;
 
-            if (currentHits >= maxHits)
+            if (bouncesLeft > 0)
             {
-                Destroy(gameObject);
+                bouncesLeft--;
+                _direction = Random.insideUnitCircle.normalized;
+            }
+            else
+            {
+                currentHits++;
+
+                if (currentHits >= maxHits)
+                {
+                    Destroy(gameObject);
+                }
             }
         }
-        
     }
 }

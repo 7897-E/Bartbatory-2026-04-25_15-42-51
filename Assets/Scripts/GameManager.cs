@@ -42,7 +42,7 @@ private VisualElement fadeScreen;
     }
 
     BoardManager.Init();
-    PlayerController.Spawn(BoardManager, new Vector2Int(80, 1));
+    PlayerController.Spawn(BoardManager, new Vector2Int(80, 5));
     StartCoroutine(SpawnEnemiesLoop());
 }
     public void StartGame()

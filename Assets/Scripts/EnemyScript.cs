@@ -11,6 +11,10 @@ public class EnemyScript : MonoBehaviour
 
     public float followSpeed = 5f;
 
+    public XPOrb XPOrbPrefab;
+    [Header("XP Settings Inherited by Spawner")]
+    public int XP = 10;
+
     [Header("Damage Settings Inherited by Spawner")]
     public int Damage;
     public float cooldown;
@@ -28,7 +32,7 @@ public class EnemyScript : MonoBehaviour
 
     private SpriteRenderer sr;
 
-    public void Init(MapGeneration mapGeneration, Transform targetTransform, int h, PlayerController playerCharacter, float followSpeed, int Zombdamage, float ZombCooldown)
+    public void Init(MapGeneration mapGeneration, Transform targetTransform, int h, PlayerController playerCharacter, float followSpeed, int Zombdamage, float ZombCooldown, int xp)
     {
         this.followSpeed = followSpeed;
         this.Damage = Zombdamage;
@@ -39,6 +43,7 @@ public class EnemyScript : MonoBehaviour
         maxHealth = h;
         currentHealth = maxHealth;
         PlayerCharacter = playerCharacter;
+        XP = xp;
     }
 
     private void Start()
@@ -89,8 +94,13 @@ public class EnemyScript : MonoBehaviour
     }
 
     private void Die()
+{
+    if (XPOrbPrefab != null)
     {
-        PlayerCharacter.AddXP(10);
-        Destroy(gameObject);
+        XPOrb xpOrb = Instantiate(XPOrbPrefab, transform.position, Quaternion.identity);
+        xpOrb.Init(XP);
     }
+
+    Destroy(gameObject);
+}
 }

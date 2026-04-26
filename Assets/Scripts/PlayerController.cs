@@ -274,7 +274,7 @@ public class PlayerController : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         EnemyScript enemy = collision.gameObject.GetComponent<EnemyScript>();
-
+        XPOrb xpOrb = collision.gameObject.GetComponent<XPOrb>();
         if (enemy != null)
         {
             bool alreadyTracked = false;
@@ -298,6 +298,11 @@ public class PlayerController : MonoBehaviour
 
                 CollidingEnemies.Add(data);
             }
+        }
+        if (xpOrb != null)
+        {
+            AddXP(xpOrb.XPValue);
+            Destroy(xpOrb.gameObject);
         }
     }
 

@@ -43,6 +43,9 @@ public class Upgrades : ScriptableObject
             case UpgradeAttribute.MaxHits:
                 weapon.MaxHits = (int)ApplyValue(weapon.MaxHits, change);
                 break;
+            case UpgradeAttribute.Bounces:
+                weapon.bounces = (int)ApplyValue(weapon.bounces, change);
+                break;
         }
     }
 
@@ -73,7 +76,8 @@ public enum UpgradeAttribute
     CurrentHealth,
     FireRate,
     ProjectileSpeed,
-    MaxHits
+    MaxHits,
+    Bounces
 
 }
 

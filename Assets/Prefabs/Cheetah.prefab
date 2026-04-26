@@ -103,6 +103,8 @@ MonoBehaviour:
   PlayerCharacter: {fileID: 0}
   offset: {x: 0, y: 0, z: 0}
   followSpeed: 0.5
+  XPOrbPrefab: {fileID: 863922030226166341, guid: ee46d72faf4df1741a832a670c3df9f6, type: 3}
+  XP: 10
   Damage: 1
   cooldown: 2
   maxHealth: 10
