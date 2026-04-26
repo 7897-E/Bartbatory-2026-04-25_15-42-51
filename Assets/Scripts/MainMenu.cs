@@ -61,9 +61,10 @@ public class MainMenu : MonoBehaviour
     private System.Collections.IEnumerator DisableUIAfterFade(float delay)
     {
         yield return new WaitForSeconds(delay);
-
-        gameObject.SetActive(false);
-
-
+        if (_menuRoot != null)
+        {
+            _menuRoot.style.display = DisplayStyle.None;
+        }
     }
+    
 }

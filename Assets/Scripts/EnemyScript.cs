@@ -4,6 +4,7 @@ public class EnemyScript : MonoBehaviour
 {
     private MapGeneration m_Board;
     public Transform target;
+    public PlayerController PlayerCharacter;
 
     public Vector3 offset = new Vector3(0f, 0f, 0f);
     public float followSpeed = 5f;
@@ -15,13 +16,15 @@ public class EnemyScript : MonoBehaviour
     [Header("Health Settings")]
     public int maxHealth = 10;
     public int currentHealth;
+    
 
-    public void Init(MapGeneration mapGeneration, Transform targetTransform, int h)
+    public void Init(MapGeneration mapGeneration, Transform targetTransform, int h, PlayerController playerCharacter)
     {
         m_Board = mapGeneration;
         target = targetTransform;
         maxHealth = h;
         currentHealth = maxHealth;
+        PlayerCharacter = playerCharacter;
     }
 
     private void LateUpdate()
@@ -47,6 +50,7 @@ public class EnemyScript : MonoBehaviour
 
     private void Die()
     {
+        PlayerCharacter.AddXP(10);
         Destroy(gameObject);
     }
 }

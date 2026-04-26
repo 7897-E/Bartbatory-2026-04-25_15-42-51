@@ -224,7 +224,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 8
   maxHealth: 10
-  currentHealth: 0
+  currentHealth: 10
+  currentXP: 50
+  maxXP: 100
+  uiDocumentObject: {fileID: 2068173648}
+  barAnimationSpeed: 8
+  upgrades: {fileID: 1188654722}
 --- !u!70 &159124795
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -933,7 +938,7 @@ MonoBehaviour:
   m_PanelSettings: {fileID: 11400000, guid: 997497c16e9233a4eb412748d4996065, type: 2}
   m_ParentUI: {fileID: 0}
   sourceAsset: {fileID: 9197481963319205126, guid: 05a3b3598ac238449abe904c52212b1f, type: 3}
-  m_SortingOrder: 12
+  m_SortingOrder: 13
 --- !u!4 &1188654721
 Transform:
   m_ObjectHideFlags: 0
@@ -1044,6 +1049,69 @@ MonoBehaviour:
   ObstacleTiles:
   - {fileID: 11400000, guid: 3c38d9a157b70b04e84ce8597a8e025a, type: 2}
   - {fileID: 11400000, guid: 99420b3e6f4c7504294f2aa67089cd91, type: 2}
+--- !u!1 &2068173648
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2068173650}
+  - component: {fileID: 2068173649}
+  - component: {fileID: 2068173651}
+  m_Layer: 0
+  m_Name: Overlay
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2068173649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2068173648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PanelSettings: {fileID: 11400000, guid: 997497c16e9233a4eb412748d4996065, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 9197481963319205126, guid: a63a0f7810f9c704da7a251bc775ff05, type: 3}
+  m_SortingOrder: 1
+--- !u!4 &2068173650
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2068173648}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2068173651
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2068173648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71c995022f7d4c74eba19e24a43f2497, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 159124794}
+  animationSpeed: 8
 --- !u!1 &2114047223
 GameObject:
   m_ObjectHideFlags: 0
@@ -1077,7 +1145,7 @@ MonoBehaviour:
   m_PanelSettings: {fileID: 11400000, guid: 997497c16e9233a4eb412748d4996065, type: 2}
   m_ParentUI: {fileID: 0}
   sourceAsset: {fileID: 9197481963319205126, guid: 3156fad1e9654364e82ee915652c8b34, type: 3}
-  m_SortingOrder: 11
+  m_SortingOrder: 12
 --- !u!4 &2114047225
 Transform:
   m_ObjectHideFlags: 0
@@ -1118,3 +1186,4 @@ SceneRoots:
   - {fileID: 2114047225}
   - {fileID: 788658866}
   - {fileID: 1188654721}
+  - {fileID: 2068173650}

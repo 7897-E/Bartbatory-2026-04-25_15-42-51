@@ -1,32 +1,56 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 public class PlayerController : MonoBehaviour
 {
     private MapGeneration m_Board;
     private Vector2Int m_CellPosition;
 
-    public float moveSpeed = 5f; 
+    public float moveSpeed = 5f;
 
     private Vector3 m_TargetWorldPos;
     private bool m_IsMoving = false;
+
     [Header("Player Stats")]
     public int maxHealth = 10;
     public int currentHealth;
+
+    [Header("XP")]
+    public int currentXP = 0;
+    public int maxXP = 100;
+
+    [Header("UI")]
+    [SerializeField] private GameObject uiDocumentObject;
+    [SerializeField] private float barAnimationSpeed = 8f;
+
+    public UpgradeUIController upgrades;
+
+    private UIDocument uiDocument;
+    private ProgressBar healthBar;
+    private ProgressBar xpBar;
+
+    private float displayedHealth;
+    private float displayedXP;
+
     private class EnemyData
     {
         public EnemyScript enemy;
         public float cooldownRemaining;
     }
+
     private List<EnemyData> CollidingEnemies = new List<EnemyData>();
 
     public void Spawn(MapGeneration MapGeneration, Vector2Int cell)
     {
         m_Board = MapGeneration;
         MoveTo(cell, snapInstantly: true);
+
         currentHealth = maxHealth;
+        currentXP = 0;
+
+        SetupUI();
     }
 
     public void MoveTo(Vector2Int cell, bool snapInstantly = false)
@@ -59,10 +83,13 @@ public class PlayerController : MonoBehaviour
             input.x += 1f;
         if (Keyboard.current.leftArrowKey.isPressed)
             input.x -= 1f;
+
         if (input.sqrMagnitude > 1f)
             input = input.normalized;
+
         Vector3 delta = new Vector3(input.x, input.y, 0f) * moveSpeed * Time.deltaTime;
         transform.position += delta;
+
         if (m_IsMoving)
         {
             transform.position = Vector3.MoveTowards(
@@ -70,14 +97,109 @@ public class PlayerController : MonoBehaviour
                 m_TargetWorldPos,
                 moveSpeed * Time.deltaTime
             );
+
             if (Vector3.Distance(transform.position, m_TargetWorldPos) < 0.001f)
             {
                 transform.position = m_TargetWorldPos;
                 m_IsMoving = false;
             }
         }
+
         UpdateDamages();
+        AnimateBars();
     }
+
+    private void SetupUI()
+    {
+        if (uiDocumentObject == null)
+        {
+            Debug.LogError("UI Document GameObject is not assigned!");
+            return;
+        }
+
+        uiDocument = uiDocumentObject.GetComponent<UIDocument>();
+
+        if (uiDocument == null)
+        {
+            Debug.LogError("Assigned GameObject does not have a UIDocument!");
+            return;
+        }
+
+        VisualElement root = uiDocument.rootVisualElement;
+
+        healthBar = root.Q<ProgressBar>("HealthBar");
+        xpBar = root.Q<ProgressBar>("XPBar");
+
+        if (healthBar == null)
+            Debug.LogError("Could not find ProgressBar named HealthBar");
+
+        if (xpBar == null)
+            Debug.LogError("Could not find ProgressBar named XPBar");
+
+        displayedHealth = currentHealth;
+        displayedXP = currentXP;
+
+        UpdateBarLimits();
+        ForceUpdateBars();
+    }
+
+    private void UpdateBarLimits()
+    {
+        if (healthBar != null)
+        {
+            healthBar.lowValue = 0;
+            healthBar.highValue = maxHealth;
+        }
+
+        if (xpBar != null)
+        {
+            xpBar.lowValue = 0;
+            xpBar.highValue = maxXP;
+        }
+    }
+
+    private void ForceUpdateBars()
+    {
+        if (healthBar != null)
+        {
+            healthBar.value = displayedHealth;
+            healthBar.title = currentHealth + " / " + maxHealth;
+        }
+
+        if (xpBar != null)
+        {
+            xpBar.value = displayedXP;
+            xpBar.title = currentXP + " / " + maxXP;
+        }
+    }
+
+    private void AnimateBars()
+    {
+        if (healthBar != null)
+        {
+            displayedHealth = Mathf.Lerp(
+                displayedHealth,
+                currentHealth,
+                Time.deltaTime * barAnimationSpeed
+            );
+
+            healthBar.value = displayedHealth;
+            healthBar.title = currentHealth + " / " + maxHealth;
+        }
+
+        if (xpBar != null)
+        {
+            displayedXP = Mathf.Lerp(
+                displayedXP,
+                currentXP,
+                Time.deltaTime * barAnimationSpeed
+            );
+
+            xpBar.value = displayedXP;
+            xpBar.title = currentXP + " / " + maxXP;
+        }
+    }
+
     private void UpdateDamages()
     {
         if (CollidingEnemies.Count == 0)
@@ -100,33 +222,65 @@ public class PlayerController : MonoBehaviour
             if (data.cooldownRemaining <= 0f)
             {
                 TakeDamage(data.enemy.Damage);
-
                 data.cooldownRemaining = data.enemy.cooldown;
             }
         }
     }
+
     private void TakeDamage(int amount)
     {
         currentHealth -= amount;
-        Debug.Log($"Player took {amount} damage. Health = {currentHealth}");
+
         if (currentHealth <= 0)
         {
             currentHealth = 0;
             Die();
         }
+
+        UpdateBarLimits();
+
+        Debug.Log($"Player took {amount} damage. Health = {currentHealth}");
+    }
+
+    public void AddXP(int amount)
+    {
+        currentXP += amount;
+
+        if (currentXP >= maxXP)
+        {
+            currentXP -= maxXP;
+            LevelUp();
+        }
+
+        UpdateBarLimits();
+    }
+
+    private void LevelUp()
+    {
+        Debug.Log("Level up!");
+
+        maxHealth += 5;
+        currentHealth = maxHealth;
+
+        maxXP += 50;
+        upgrades.ShowRandomUpgrades();
+        UpdateBarLimits();
+
     }
 
     private void Die()
     {
         Debug.Log("Player died!");
     }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         EnemyScript enemy = collision.gameObject.GetComponent<EnemyScript>();
+
         if (enemy != null)
         {
-            // Only add if not already in the list
             bool alreadyTracked = false;
+
             foreach (var e in CollidingEnemies)
             {
                 if (e.enemy == enemy)
@@ -141,8 +295,9 @@ public class PlayerController : MonoBehaviour
                 var data = new EnemyData
                 {
                     enemy = enemy,
-                    cooldownRemaining = 0f // 0 so it hits immediately on first contact
+                    cooldownRemaining = 0f
                 };
+
                 CollidingEnemies.Add(data);
             }
         }
@@ -151,9 +306,9 @@ public class PlayerController : MonoBehaviour
     private void OnCollisionExit2D(Collision2D collision)
     {
         EnemyScript enemy = collision.gameObject.GetComponent<EnemyScript>();
+
         if (enemy != null)
         {
-            // remove from list when we stop colliding
             for (int i = CollidingEnemies.Count - 1; i >= 0; i--)
             {
                 if (CollidingEnemies[i].enemy == enemy)
