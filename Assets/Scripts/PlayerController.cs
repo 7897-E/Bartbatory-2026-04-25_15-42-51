@@ -22,8 +22,10 @@ public class PlayerController : MonoBehaviour
     public int maxXP = 100;
 
     [Header("UI")]
-    [SerializeField] private GameObject uiDocumentObject;
-    [SerializeField] private float barAnimationSpeed = 8f;
+    public GameObject uiDocumentObject;
+    public float barAnimationSpeed = 8f;
+
+    public GameUI gameUI;
 
     public UpgradeUIController upgrades;
 
@@ -264,7 +266,9 @@ public class PlayerController : MonoBehaviour
 
     private void Die()
     {
+        currentXP= 0;
         Debug.Log("Player died!");
+        gameUI.ShowDeathScreen();
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

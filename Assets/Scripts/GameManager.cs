@@ -1,15 +1,22 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class GameManager : MonoBehaviour
 {
+    
     public static MapGeneration Instance { get; private set; }
-
+    [Header("References")]
     public MapGeneration BoardManager;
     public PlayerController PlayerController;
     public EnemySpawner enemySpawner;
     public UpgradeUIController upgrades;
+    [Header("UI")]
+    public UIDocument gameUIDocument;
+    public float fadeInDuration = 1.5f;
 
+private VisualElement fadeScreen;
+    [Header("Spawn Settings")]
     public float spawnInterval = 3f;   
     public float offscreenMargin = 2f;
     public int Scaling = 10;
@@ -21,15 +28,26 @@ public class GameManager : MonoBehaviour
     }
 
     void Start()
+{
+    if (gameUIDocument != null)
     {
-        
+        fadeScreen = gameUIDocument.rootVisualElement.Q<VisualElement>("FadeScreen");
+
+        if (fadeScreen != null)
+        {
+            fadeScreen.style.display = DisplayStyle.Flex;
+            fadeScreen.style.opacity = 1f;
+            StartCoroutine(FadeInFromBlack());
+        }
     }
+
+    BoardManager.Init();
+    PlayerController.Spawn(BoardManager, new Vector2Int(80, 1));
+    StartCoroutine(SpawnEnemiesLoop());
+}
     public void StartGame()
     {
-        BoardManager.Init();
-        PlayerController.Spawn(BoardManager, new Vector2Int(80, 1));
-        StartCoroutine(SpawnEnemiesLoop());
-        upgrades.ShowRandomUpgrades();
+        
     }
 
     private IEnumerator SpawnEnemiesLoop()
@@ -128,4 +146,21 @@ else
         }
         return new Vector3(x, y, 0f);
     }
+    private IEnumerator FadeInFromBlack()
+{
+    float timer = 0f;
+
+    while (timer < fadeInDuration)
+    {
+        timer += Time.deltaTime;
+        float t = timer / fadeInDuration;
+
+        fadeScreen.style.opacity = Mathf.Lerp(1f, 0f, t);
+
+        yield return null;
+    }
+
+    fadeScreen.style.opacity = 0f;
+    fadeScreen.style.display = DisplayStyle.None;
+}
 }
