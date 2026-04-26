@@ -33,23 +33,66 @@ public class GameManager : MonoBehaviour
     }
 
     private IEnumerator SpawnEnemiesLoop()
-    {
-        int count = 0;
-        
-        while (true)
-        {
-            yield return new WaitForSeconds(spawnInterval);
+{
+    int count = 0;
 
-            if (PlayerController == null || PlayerController.transform == null)
-                continue;
-            if (count == Scaling && spawnInterval >=0) { spawnInterval -= 0.1f; count = 0; Scaling += Scaling + (int)(Scaling * .5);  }
-            if(spawnInterval < 0) { spawnInterval = 0; }
-            Vector3 spawnPos = GetOffscreenSpawnPosition();
-            enemySpawner.SpawnZomb(BoardManager, PlayerController.transform, spawnPos, PlayerController);
-            enemySpawner.SpawnCheetah(BoardManager, PlayerController.transform, spawnPos, PlayerController);
-            count++;
+    while (true)
+    {
+        yield return new WaitForSeconds(spawnInterval);
+
+        if (PlayerController == null || PlayerController.transform == null)
+            continue;
+
+        if (count == Scaling && spawnInterval >= 0)
+        {
+            spawnInterval -= 0.1f;
+            count = 0;
+            Scaling += Scaling + (int)(Scaling * .5);
         }
+
+        if (spawnInterval < 0)
+        {
+            spawnInterval = 0;
+        }
+
+        Vector3 spawnPos = GetOffscreenSpawnPosition();
+
+        if (spawnInterval <= 0.3f)
+{
+    int randomEnemy = Random.Range(0, 3);
+
+    if (randomEnemy == 0)
+    {
+        enemySpawner.SpawnZomb(BoardManager, PlayerController.transform, spawnPos, PlayerController);
     }
+    else if (randomEnemy == 1)
+    {
+        enemySpawner.SpawnCheetah(BoardManager, PlayerController.transform, spawnPos, PlayerController);
+    }
+    else
+    {
+        enemySpawner.SpawnBulk(BoardManager, PlayerController.transform, spawnPos, PlayerController);
+    }
+}
+else if (spawnInterval <= 0.4f)
+{
+    if (Random.value < 0.5f)
+    {
+        enemySpawner.SpawnZomb(BoardManager, PlayerController.transform, spawnPos, PlayerController);
+    }
+    else
+    {
+        enemySpawner.SpawnCheetah(BoardManager, PlayerController.transform, spawnPos, PlayerController);
+    }
+}
+else
+{
+    enemySpawner.SpawnZomb(BoardManager, PlayerController.transform, spawnPos, PlayerController);
+}
+
+        count++;
+    }
+}
 
     private Vector3 GetOffscreenSpawnPosition()
     {        Vector3 bottomLeft = mainCam.ViewportToWorldPoint(new Vector3(0f, 0f, mainCam.nearClipPlane));

@@ -53,7 +53,7 @@ public class EnemyScript : MonoBehaviour
         Vector3 previousPosition = transform.position;
 
         Vector3 desiredPosition = target.position + offset;
-        transform.position = Vector3.Lerp(
+        transform.position = Vector3.MoveTowards(
             transform.position,
             desiredPosition,
             followSpeed * Time.deltaTime
