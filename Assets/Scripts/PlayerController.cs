@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -9,6 +10,7 @@ public class PlayerController : MonoBehaviour
     private Vector2Int m_CellPosition;
 
     public float moveSpeed = 5f;
+    private float activeMoveSpeed;
 
     private Vector3 m_TargetWorldPos;
     private bool m_IsMoving = false;
@@ -16,6 +18,17 @@ public class PlayerController : MonoBehaviour
     [Header("Player Stats")]
     public int maxHealth = 10;
     public int currentHealth;
+
+    [Header("Dash stats")]
+    public float dashSpeed;
+    public float dashLength = .05f, dashCooldown = .15f;
+    private float dashCounter;
+    private float dashCoolCounter;
+    private TrailRenderer _trailRenderer;
+
+    private bool m_IsDashing = false;
+    private Vector3 m_DashDirection = Vector3.zero;
+    private float dashRecoverSpeed = 10f;
 
     [Header("XP")]
     public int currentXP = 0;
@@ -51,6 +64,9 @@ public class PlayerController : MonoBehaviour
 
         currentHealth = maxHealth;
         currentXP = 0;
+        activeMoveSpeed = moveSpeed;
+        dashSpeed = moveSpeed * 2.5f;
+        _trailRenderer = GetComponent<TrailRenderer>();
 
         SetupUI();
     }
@@ -71,26 +87,73 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+
+
     private void Update()
     {
         if (Keyboard.current == null) return;
 
         Vector2 input = Vector2.zero;
 
-        if (Keyboard.current.upArrowKey.isPressed)
+        if (Keyboard.current.upArrowKey.isPressed || Keyboard.current.wKey.isPressed)
             input.y += 1f;
-        if (Keyboard.current.downArrowKey.isPressed)
+        if (Keyboard.current.downArrowKey.isPressed || Keyboard.current.sKey.isPressed)
             input.y -= 1f;
-        if (Keyboard.current.rightArrowKey.isPressed)
+        if (Keyboard.current.rightArrowKey.isPressed || Keyboard.current.dKey.isPressed)
             input.x += 1f;
-        if (Keyboard.current.leftArrowKey.isPressed)
+        if (Keyboard.current.leftArrowKey.isPressed || Keyboard.current.aKey.isPressed)
             input.x -= 1f;
 
-        if (input.sqrMagnitude > 1f)
-            input = input.normalized;
+        if (Keyboard.current.leftShiftKey.isPressed)
+        {
+            if (dashCoolCounter <= 0 && dashCounter <= 0)
+            {
+                m_IsDashing = true;
+                activeMoveSpeed = dashSpeed;
+                dashCounter = dashLength;
+                _trailRenderer.emitting = true;
 
-        Vector3 delta = new Vector3(input.x, input.y, 0f) * moveSpeed * Time.deltaTime;
-        transform.position += delta;
+                Vector2 dir2 = input.sqrMagnitude > 0f ? input.normalized : new Vector2(transform.right.x, transform.right.y);
+                m_DashDirection = new Vector3(dir2.x, dir2.y, 0f);
+            }
+        }
+
+        if (dashCounter > 0)
+        {
+            dashCounter -= Time.deltaTime;
+
+            if (dashCounter <= 0)
+            {
+                m_IsDashing = false;
+                dashCoolCounter = dashCooldown;
+
+            }
+        }
+
+        if (dashCoolCounter > 0)
+        {
+            dashCoolCounter -= Time.deltaTime;
+        }
+
+        if (!m_IsDashing)
+        {
+
+            if (input.sqrMagnitude > 1f)
+                input = input.normalized;
+
+        
+            activeMoveSpeed = Mathf.Lerp(activeMoveSpeed, moveSpeed, Time.deltaTime * dashRecoverSpeed);
+
+            Vector3 delta = new Vector3(input.x, input.y, 0f) * activeMoveSpeed * Time.deltaTime;
+            transform.position += delta;
+            _trailRenderer.emitting = false;
+        }
+        else
+        {
+        
+            transform.position += m_DashDirection * dashSpeed * Time.deltaTime;
+           
+        }
 
         if (m_IsMoving)
         {
@@ -110,6 +173,7 @@ public class PlayerController : MonoBehaviour
         UpdateDamages();
         AnimateBars();
     }
+
 
     private void SetupUI()
     {
