@@ -629,11 +629,12 @@ MonoBehaviour:
   BulkXp: 20
   BossBulkPrefab: {fileID: 7336514868459462141, guid: e37972b77b33af847816bd0b8d693a0c, type: 3}
   BossBulkHealth: 1000
-  BossBulKFallowSpeed: 2
+  BossBulKFallowSpeed: 2.5
   BossBulkXp: 200
   projectile: {fileID: -2074199717930713086, guid: 33ebef0efef2f4547bb02369f823e4db, type: 3}
   projectileSpeed: 5
   BossBulkdamage: 100
+  BossProjectileDamage: 20
   BossBulkCooldown: 3
   cam: {fileID: 519420031}
 --- !u!4 &168171034
@@ -2433,15 +2434,11 @@ MonoBehaviour:
   Width: 160
   Height: 160
   GroundTiles:
-  - {fileID: 11400000, guid: 1c2fcace10de3d04f998935a1c1cb26c, type: 2}
-  - {fileID: 11400000, guid: aa6f110604a3ac44e96c9d8df3e2ad3b, type: 2}
-  - {fileID: 11400000, guid: cca073471dc20be4eacce560ab78589c, type: 2}
+  - {fileID: 11400000, guid: 971fb0ca4dec89a4ea64182fa636e802, type: 2}
   WallTiles:
-  - {fileID: 11400000, guid: e193d137f9d14544d819b50575037ff3, type: 2}
-  - {fileID: 11400000, guid: 53f6de09a8177da4fa47900701da3a07, type: 2}
+  - {fileID: 11400000, guid: c8bc71dd04aa3894bb8b17107c568bb9, type: 2}
   ObstacleTiles:
   - {fileID: 11400000, guid: 3c38d9a157b70b04e84ce8597a8e025a, type: 2}
-  - {fileID: 11400000, guid: 99420b3e6f4c7504294f2aa67089cd91, type: 2}
 --- !u!1 &1836304232
 GameObject:
   m_ObjectHideFlags: 0
