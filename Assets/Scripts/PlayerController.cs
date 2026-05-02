@@ -61,6 +61,9 @@ public class PlayerController : MonoBehaviour
     private float displayedCD;
     public DamageFlash damageFlash;
 
+    private Rigidbody2D rb;
+    private Vector2 moveInput = Vector2.zero;
+
     private class EnemyData
     {
         public EnemyScript enemy;
@@ -96,6 +99,14 @@ public class PlayerController : MonoBehaviour
         dashSpeed = moveSpeed * 2.5f;
         _trailRenderer = GetComponent<TrailRenderer>();
 
+        rb = GetComponent<Rigidbody2D>();
+        if (rb == null)
+        {
+            rb = gameObject.AddComponent<Rigidbody2D>();
+        }
+        rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+        rb.gravityScale = 0f;
+
         SetupUI();
     }
 
@@ -121,16 +132,16 @@ public class PlayerController : MonoBehaviour
     {
         if (Keyboard.current == null) return;
 
-        Vector2 input = Vector2.zero;
+        moveInput = Vector2.zero;
 
         if (Keyboard.current.upArrowKey.isPressed || Keyboard.current.wKey.isPressed)
-            input.y += 1f;
+            moveInput.y += 1f;
         if (Keyboard.current.downArrowKey.isPressed || Keyboard.current.sKey.isPressed)
-            input.y -= 1f;
+            moveInput.y -= 1f;
         if (Keyboard.current.rightArrowKey.isPressed || Keyboard.current.dKey.isPressed)
-            input.x += 1f;
+            moveInput.x += 1f;
         if (Keyboard.current.leftArrowKey.isPressed || Keyboard.current.aKey.isPressed)
-            input.x -= 1f;
+            moveInput.x -= 1f;
 
         if (Keyboard.current.leftShiftKey.isPressed)
         {
@@ -144,8 +155,8 @@ public class PlayerController : MonoBehaviour
 
                 _trailRenderer.emitting = true;
 
-                Vector2 dir2 = input.sqrMagnitude > 0f
-                    ? input.normalized
+                Vector2 dir2 = moveInput.sqrMagnitude > 0f
+                    ? moveInput.normalized
                     : new Vector2(transform.right.x, transform.right.y);
 
                 m_DashDirection = new Vector3(dir2.x, dir2.y, 0f);
@@ -169,40 +180,32 @@ public class PlayerController : MonoBehaviour
             if (dashCounter < 0f) dashCounter = 0f;
         }
 
+        UpdateDamages();
+        AnimateBars();
+    }
+
+    private void FixedUpdate()
+    {
+        if (rb == null) return;
+
+        Vector2 velocity = Vector2.zero;
+
         if (!m_IsDashing)
         {
+            Vector2 input = moveInput;
 
             if (input.sqrMagnitude > 1f)
                 input = input.normalized;
 
             activeMoveSpeed = Mathf.Lerp(activeMoveSpeed, moveSpeed, Time.deltaTime * dashRecoverSpeed);
-
-            Vector3 delta = new Vector3(input.x, input.y, 0f) * activeMoveSpeed * Time.deltaTime;
-            transform.position += delta;
+            velocity = input * activeMoveSpeed;
         }
         else
         {
-
-            transform.position += m_DashDirection * dashSpeed * Time.deltaTime;
+            velocity = (Vector2)m_DashDirection * dashSpeed;
         }
 
-        if (m_IsMoving)
-        {
-            transform.position = Vector3.MoveTowards(
-                transform.position,
-                m_TargetWorldPos,
-                moveSpeed * Time.deltaTime
-            );
-
-            if (Vector3.Distance(transform.position, m_TargetWorldPos) < 0.001f)
-            {
-                transform.position = m_TargetWorldPos;
-                m_IsMoving = false;
-            }
-        }
-
-        UpdateDamages();
-        AnimateBars();
+        rb.velocity = velocity;
     }
 
 
