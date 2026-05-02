@@ -10,7 +10,7 @@ public class Upgrades : ScriptableObject
 
     public UpgradeChange[] changes;
 
-    public void Apply(PlayerController playerController, BatScript weapon, int level = 1)
+    public void Apply(PlayerController playerController, Weapons weapon, int level = 1)
     {
         foreach (var change in changes)
         {
@@ -18,8 +18,9 @@ public class Upgrades : ScriptableObject
         }
     }
 
-    private void ApplyChange(PlayerController player, UpgradeChange change, BatScript weapon, int level)
+    private void ApplyChange(PlayerController player, UpgradeChange change, Weapons weapon, int level)
     {
+        // Update player stats (not weapon-specific)
         switch (change.attribute)
         {
             case UpgradeAttribute.MoveSpeed:
@@ -31,21 +32,30 @@ public class Upgrades : ScriptableObject
             case UpgradeAttribute.CurrentHealth:
                 player.currentHealth = (int)ApplyValue(player.currentHealth, change, level);
                 break;
-            case UpgradeAttribute.FireRate:
-                weapon.fireRate = ApplyValue(weapon.fireRate, change, level);
-                break;
-            case UpgradeAttribute.Damage:
-                weapon.damage = (int)ApplyValue(weapon.damage, change, level);
-                break;
-            case UpgradeAttribute.ProjectileSpeed:
-                weapon.bulletSpeed = ApplyValue(weapon.bulletSpeed, change, level);
-                break;
-            case UpgradeAttribute.MaxHits:
-                weapon.MaxHits = (int)ApplyValue(weapon.MaxHits, change, level);
-                break;
-            case UpgradeAttribute.Bounces:
-                weapon.bounces = (int)ApplyValue(weapon.bounces, change, level);
-                break;
+        }
+
+        // Update the active weapon instance in the scene if it exists
+        if (player.weaponInstances.TryGetValue(weapon, out BatScript batInstance))
+        {
+            switch (change.attribute)
+            {
+                case UpgradeAttribute.FireRate:
+                    // Fire rate decreases by 0.1 per upgrade (faster fire)
+                    batInstance.fireRate = Mathf.Max(0.05f, batInstance.fireRate - 0.1f * level);
+                    break;
+                case UpgradeAttribute.Damage:
+                    batInstance.damage = (int)ApplyValue(batInstance.damage, change, level);
+                    break;
+                case UpgradeAttribute.ProjectileSpeed:
+                    batInstance.bulletSpeed = ApplyValue(batInstance.bulletSpeed, change, level);
+                    break;
+                case UpgradeAttribute.MaxHits:
+                    batInstance.MaxHits = (int)ApplyValue(batInstance.MaxHits, change, level);
+                    break;
+                case UpgradeAttribute.Bounces:
+                    batInstance.bounces = (int)ApplyValue(batInstance.bounces, change, level);
+                    break;
+            }
         }
     }
 

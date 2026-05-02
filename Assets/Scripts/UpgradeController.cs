@@ -32,6 +32,10 @@ public class UpgradeUIController : MonoBehaviour
     private readonly List<Weapons> currentWeaponChoices = new();
     private readonly List<VisualElement> spawnedCards = new();
     private readonly Dictionary<Button, VisualElement> dropdownPanels = new();
+    
+    // Store upgrade-weapon pairs for tracking which weapon each upgrade applies to
+    private readonly List<(Upgrades upgrade, Weapons weapon)> currentUpgradeChoices = new();
+    private readonly Dictionary<Button, (Upgrades upgrade, Weapons weapon)> buttonToUpgradeWeaponPair = new();
 
     private void Awake()
     {
@@ -76,8 +80,27 @@ public class UpgradeUIController : MonoBehaviour
 
         ClearCards();
         currentChoices.Clear();
+        currentUpgradeChoices.Clear();
 
-        int count = Mathf.Min(choicesPerLevel, allUpgrades.Length);
+        // Build a pool of all upgrades for each weapon the player has
+        List<(Upgrades upgrade, Weapons weapon)> upgradePool = new();
+        
+        foreach (var weapon in PlayerController.weaponUpgradeLevels.Keys)
+        {
+            foreach (var upgrade in allUpgrades)
+            {
+                upgradePool.Add((upgrade, weapon));
+            }
+        }
+
+        if (upgradePool.Count == 0)
+        {
+            Debug.LogWarning("No weapons available for upgrades.");
+            return;
+        }
+
+        // Select random upgrade-weapon pairs
+        int count = Mathf.Min(choicesPerLevel, upgradePool.Count);
         HashSet<int> usedIndexes = new();
 
         for (int i = 0; i < count; i++)
@@ -86,19 +109,19 @@ public class UpgradeUIController : MonoBehaviour
 
             do
             {
-                index = Random.Range(0, allUpgrades.Length);
+                index = Random.Range(0, upgradePool.Count);
             }
             while (usedIndexes.Contains(index));
 
             usedIndexes.Add(index);
-            currentChoices.Add(allUpgrades[index]);
+            currentUpgradeChoices.Add(upgradePool[index]);
         }
 
         Show();
 
-        foreach (Upgrades upgrade in currentChoices)
+        foreach (var (upgrade, weapon) in currentUpgradeChoices)
         {
-            CreateUpgradeCard(upgrade);
+            CreateUpgradeCard(upgrade, weapon);
         }
 
         MatchCardSizes();
@@ -147,7 +170,7 @@ public class UpgradeUIController : MonoBehaviour
         Time.timeScale = 0f;
     }
 
-    private void CreateUpgradeCard(Upgrades data)
+    private void CreateUpgradeCard(Upgrades upgrade, Weapons weapon)
     {
         if (cardTemplate == null)
         {
@@ -180,14 +203,15 @@ public class UpgradeUIController : MonoBehaviour
             return;
         }
 
-        button.text = data.upgradeName;
-        descriptionText.text = data.description;
+        button.text = $"{upgrade.upgradeName}";
+        descriptionText.text = $"{upgrade.description}\n({weapon.weaponName})";
 
         descriptionPanel.style.display = DisplayStyle.None;
 
         dropdownPanels[button] = descriptionPanel;
+        buttonToUpgradeWeaponPair[button] = (upgrade, weapon);
 
-        button.clicked += () => OnUpgradeSelected(data);
+        button.clicked += () => OnUpgradeSelected(upgrade, weapon);
 
         button.RegisterCallback<MouseEnterEvent>(_ => ShowDropdown(button));
         button.RegisterCallback<MouseLeaveEvent>(_ => HideDropdown(button));
@@ -291,19 +315,20 @@ public class UpgradeUIController : MonoBehaviour
         }).StartingIn(0);
     }
 
-    private void OnUpgradeSelected(Upgrades data)
+    private void OnUpgradeSelected(Upgrades upgrade, Weapons weapon)
     {
-        Debug.Log($"Selected: {data.upgradeName}");
+        Debug.Log($"Selected: {upgrade.upgradeName} for {weapon.weaponName}");
 
-        if (PlayerController.currentWeapon != null && PlayerController.weaponUpgradeLevels.ContainsKey(PlayerController.currentWeapon))
+        if (PlayerController.weaponUpgradeLevels.ContainsKey(weapon))
         {
-            int level = PlayerController.weaponUpgradeLevels[PlayerController.currentWeapon];
-            data.Apply(PlayerController, BatScript, level + 1);
-            PlayerController.weaponUpgradeLevels[PlayerController.currentWeapon]++;
+            int level = PlayerController.weaponUpgradeLevels[weapon];
+            upgrade.Apply(PlayerController, weapon, level + 1);
+            PlayerController.weaponUpgradeLevels[weapon]++;
         }
         else
         {
-            data.Apply(PlayerController, BatScript);
+            Debug.LogWarning($"Weapon {weapon.weaponName} not found in player's weapons.");
+            upgrade.Apply(PlayerController, weapon);
         }
 
         Hide();
@@ -315,10 +340,14 @@ public class UpgradeUIController : MonoBehaviour
     {
         Debug.Log($"Selected: {data.weaponName}");
 
-        // Do not destroy current weapon, add new one
         PlayerController.weaponCount++;
 
-        data.Apply(PlayerController, weaponHolder, playerCamera, PlayerController.weaponCount - 1);
+        GameObject weaponPivot = data.Apply(PlayerController, weaponHolder, playerCamera, PlayerController.weaponCount - 1);
+        BatScript bat = weaponPivot.GetComponentInChildren<BatScript>();
+        if (bat != null)
+        {
+            PlayerController.weaponInstances[data] = bat;
+        }
 
         PlayerController.currentWeapon = data;
         if (!PlayerController.weaponUpgradeLevels.ContainsKey(data))
@@ -340,6 +369,7 @@ public class UpgradeUIController : MonoBehaviour
 
         spawnedCards.Clear();
         dropdownPanels.Clear();
+        buttonToUpgradeWeaponPair.Clear();
     }
 
     public void Show()

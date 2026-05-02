@@ -9,6 +9,13 @@ public class Weapons : ScriptableObject
     public string description;
     public GameObject weapon;
 
+    [Header("Weapon Stats")]
+    public float fireRate = 0.3f;
+    public int damage = 1;
+    public float bulletSpeed = 10f;
+    public int MaxHits = 1;
+    public int bounces = 0;
+
     public GameObject Apply(PlayerController playerController, Transform weaponHolder, Camera playerCamera, int weaponIndex = 0)
     {
         if (weapon == null)
@@ -37,6 +44,12 @@ public class Weapons : ScriptableObject
             Debug.LogError($"Weapon prefab '{weapon.name}' does not have a BatScript on its children.");
             return weaponPivot;
         }
+
+        bat.fireRate = fireRate;
+        bat.damage = damage;
+        bat.bulletSpeed = bulletSpeed;
+        bat.MaxHits = MaxHits;
+        bat.bounces = bounces;
 
         if (playerCamera != null)
         {

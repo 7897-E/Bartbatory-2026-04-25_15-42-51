@@ -40,6 +40,7 @@ public class PlayerController : MonoBehaviour
     private int totalLevels = 0;
     public Weapons currentWeapon;
     public Dictionary<Weapons, int> weaponUpgradeLevels = new();
+    public Dictionary<Weapons, BatScript> weaponInstances = new();
     public int weaponCount = 0;
 
     [Header("UI")]
@@ -77,13 +78,19 @@ public class PlayerController : MonoBehaviour
         currentXP = 0;
         totalLevels = 0;
         weaponUpgradeLevels.Clear();
+        weaponInstances.Clear();
         weaponCount = 0;
         if (startingWeapon != null)
         {
             currentWeapon = startingWeapon;
             weaponUpgradeLevels[startingWeapon] = 0;
             weaponCount = 1;
-            startingWeapon.Apply(this, upgrades.weaponHolder, upgrades.playerCamera, 0);
+            GameObject weaponPivot = startingWeapon.Apply(this, upgrades.weaponHolder, upgrades.playerCamera, 0);
+            BatScript bat = weaponPivot.GetComponentInChildren<BatScript>();
+            if (bat != null)
+            {
+                weaponInstances[startingWeapon] = bat;
+            }
         }
         activeMoveSpeed = moveSpeed;
         dashSpeed = moveSpeed * 2.5f;
