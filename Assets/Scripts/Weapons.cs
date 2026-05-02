@@ -11,10 +11,12 @@ public class Weapons : ScriptableObject
 
     [Header("Weapon Stats")]
     public float fireRate = 0.3f;
-    public int damage = 1;
-    public float bulletSpeed = 10f;
+    public int meleeDamage = 1;
+    public int projectileDamage = 5;
+     public float bulletSpeed = 10f;
     public int MaxHits = 1;
     public int bounces = 0;
+    public float weaponRadius = 1f;
 
     public GameObject Apply(PlayerController playerController, Transform weaponHolder, Camera playerCamera, int weaponIndex = 0)
     {
@@ -33,7 +35,7 @@ public class Weapons : ScriptableObject
 
         weaponPivot.transform.SetParent(weaponHolder, worldPositionStays: false);
         
-        float radius = 0.5f;
+        float radius = weaponRadius;
         int totalWeapons = playerController.weaponCount;
         float angle = (weaponIndex / (float)totalWeapons) * 360f * Mathf.Deg2Rad;
         weaponPivot.transform.localPosition = new Vector3(radius * Mathf.Cos(angle), radius * Mathf.Sin(angle), 0); 
@@ -46,7 +48,8 @@ public class Weapons : ScriptableObject
         }
 
         bat.fireRate = fireRate;
-        bat.damage = damage;
+        bat.meleeDamage = meleeDamage;
+        bat.projectileDamage = projectileDamage;
         bat.bulletSpeed = bulletSpeed;
         bat.MaxHits = MaxHits;
         bat.bounces = bounces;

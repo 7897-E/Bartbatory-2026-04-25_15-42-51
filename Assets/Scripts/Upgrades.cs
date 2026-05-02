@@ -9,9 +9,11 @@ public class Upgrades : ScriptableObject
     public string description;
 
     public UpgradeChange[] changes;
+    private int level;
 
-    public void Apply(PlayerController playerController, Weapons weapon, int level = 1)
+    public void Apply(PlayerController playerController, Weapons weapon, int level)
     {
+        this.level = level;
         foreach (var change in changes)
         {
             ApplyChange(playerController, change, weapon, level);
@@ -39,18 +41,23 @@ public class Upgrades : ScriptableObject
             {
                 case UpgradeAttribute.FireRate:
                     batInstance.fireRate = Mathf.Max(0.05f, batInstance.fireRate - 0.1f);
+                    batInstance.currentLevel = level;
                     break;
                 case UpgradeAttribute.Damage:
-                    batInstance.damage = (int)ApplyValue(batInstance.damage, change, level);
+                    batInstance.projectileDamage = (int)ApplyValue(batInstance.projectileDamage, change, level);
+                    batInstance.currentLevel = level;
                     break;
                 case UpgradeAttribute.ProjectileSpeed:
                     batInstance.bulletSpeed = ApplyValue(batInstance.bulletSpeed, change, level);
+                    batInstance.currentLevel = level;
                     break;
                 case UpgradeAttribute.MaxHits:
                     batInstance.MaxHits = (int)ApplyValue(batInstance.MaxHits, change, level);
+                    batInstance.currentLevel = level;
                     break;
                 case UpgradeAttribute.Bounces:
                     batInstance.bounces = (int)ApplyValue(batInstance.bounces, change, level);
+                    batInstance.currentLevel = level;
                     break;
             }
         }

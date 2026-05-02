@@ -135,6 +135,9 @@ MonoBehaviour:
   rotationSpeed: 720
   fireRate: 0.3
   damage: 5
+  meleeDamage: 1
+  projectileDamage: 1
+  meleeRange: 1
   bulletSpeed: 10
   MaxHits: 1
   bounces: 0
@@ -143,11 +146,14 @@ MonoBehaviour:
   railgunRange: 20
   enemyLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1
   shotgunPellets: 5
   shotgunSpread: 30
   swingAngle: 60
-  swingDuration: 0.15
+  swingDuration: 0.3
+  levelsUntilRanged: 1
+  currentLevel: 0
+  meleeOffsetDistance: 1
+  batMoveSpeed: 10
   rightOffset: {x: 0.5, y: 0, z: 0}
   leftOffset: {x: -0.5, y: 0, z: 0}
-  levelsUntilRanged: 3

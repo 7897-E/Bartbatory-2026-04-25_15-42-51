@@ -82,7 +82,6 @@ public class UpgradeUIController : MonoBehaviour
         currentChoices.Clear();
         currentUpgradeChoices.Clear();
 
-        // Build a pool of all upgrades for each weapon the player has
         List<(Upgrades upgrade, Weapons weapon)> upgradePool = new();
         
         foreach (var weapon in PlayerController.weaponUpgradeLevels.Keys)
@@ -99,7 +98,6 @@ public class UpgradeUIController : MonoBehaviour
             return;
         }
 
-        // Select random upgrade-weapon pairs
         int count = Mathf.Min(choicesPerLevel, upgradePool.Count);
         HashSet<int> usedIndexes = new();
 
@@ -322,13 +320,14 @@ public class UpgradeUIController : MonoBehaviour
         if (PlayerController.weaponUpgradeLevels.ContainsKey(weapon))
         {
             int level = PlayerController.weaponUpgradeLevels[weapon];
+            Debug.Log(level);
             upgrade.Apply(PlayerController, weapon, level + 1);
             PlayerController.weaponUpgradeLevels[weapon]++;
         }
         else
         {
             Debug.LogWarning($"Weapon {weapon.weaponName} not found in player's weapons.");
-            upgrade.Apply(PlayerController, weapon);
+            
         }
 
         Hide();

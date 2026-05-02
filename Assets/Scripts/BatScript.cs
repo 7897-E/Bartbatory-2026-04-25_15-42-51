@@ -18,7 +18,9 @@ public class BatScript : MonoBehaviour
     [Header("Firing")]
     public float fireRate = 0.3f;
     private float fireCooldown = 0f;
-    public int damage;
+    public int meleeDamage = 1;
+    public int projectileDamage = 1;
+    public float meleeRange = 1f;
     [Header("Bullet")]
     public float bulletSpeed = 10f;
     public int MaxHits = 1;
@@ -40,23 +42,27 @@ public class BatScript : MonoBehaviour
     private bool isSwinging = false;
     private float swingTimer = 0f;
     private float startAngle;
+    public int levelsUntilRanged = 5;
+
+    public int currentLevel = 0;
+    public float meleeOffsetDistance = 1.5f;   
+    [Header("Movement bat only")]
+    public float batMoveSpeed = 10f;   
 
     [Header("Side Offset (relative to player)")]
     public Vector3 rightOffset = new Vector3(0f, 0f, 0f);
     public Vector3 leftOffset = new Vector3(0f, 0f, 0f);
 
     private Transform player;
-    private PlayerController playerController;
     private EnemyScript currentTarget;
+    private bool meleeHitThisSwing;
 
-    public int levelsUntilRanged = 5;
 
     private static Dictionary<BatScript, EnemyScript> weaponTargets = new();
 
     private void Awake()
     {
         player = transform.parent;
-        playerController = GetComponentInParent<PlayerController>();
 
         if (batPivot == null)
             batPivot = transform;
@@ -81,12 +87,9 @@ public class BatScript : MonoBehaviour
 
         if (nearestEnemy != null)
         {
-            if (!isSwinging || weaponType != WeaponType.Bat)
-            {
-                AimAt(nearestEnemy.transform.position);
-                
-            }
-
+            if(currentLevel < levelsUntilRanged)
+                UpdateSide(nearestEnemy.transform.position);
+            AimAt(nearestEnemy.transform.position);
             FireAt(nearestEnemy.transform.position);
         }
         else
@@ -155,20 +158,14 @@ public class BatScript : MonoBehaviour
         switch (weaponType)
         {
             case WeaponType.Bat:
-                if (playerController != null && playerController.TotalLevels < levelsUntilRanged)
+                if ( currentLevel >= levelsUntilRanged)
                 {
-                    if (fireCooldown >= .175f)
-                    {
-                        StartSwing(targetPos);
-                    }
+                       FireBullet(targetPos);
                 }
-                else
+
+                if (!isSwinging && IsEnemyInMeleeRange())
                 {
-                    FireBullet(targetPos);
-                    if (fireCooldown >= .175f)
-                    {
-                        StartSwing(targetPos);
-                    }
+                    StartSwing(targetPos);
                 }
                 break;
             case WeaponType.Railgun:
@@ -193,7 +190,7 @@ public class BatScript : MonoBehaviour
             rot
         );
 
-        bullet.Init(dir, damage, bulletSpeed, MaxHits, bounces, cam);
+        bullet.Init(dir, projectileDamage, bulletSpeed, MaxHits, bounces, cam);
     }
 
     private void FireRailgun(Vector3 targetPos)
@@ -207,7 +204,7 @@ public class BatScript : MonoBehaviour
             EnemyScript enemy = hit.collider.GetComponent<EnemyScript>();
             if (enemy != null)
             {
-                enemy.TakeDamage(damage);
+                enemy.TakeDamage(projectileDamage);
             }
         }
     }
@@ -228,53 +225,87 @@ public class BatScript : MonoBehaviour
                 Quaternion.LookRotation(Vector3.forward, dir)
             );
 
-            bullet.Init(dir, damage, bulletSpeed, MaxHits, bounces, cam);
+            bullet.Init(dir, projectileDamage, bulletSpeed, MaxHits, bounces, cam);
         }
     }
+
+    
 
     private void UpdateSide(Vector3 targetPos)
     {
-        if (player == null) return;
-        if (isSwinging) return;
-        if (targetPos.x >= player.position.x)
-        {
-            batPivot.localPosition = rightOffset;
-        }
-        else
-        {
-            batPivot.localPosition = leftOffset;
-        }
+    if (player == null || isSwinging) return;
+
+    Vector3 dir = (targetPos - player.position).normalized;
+    Vector3 targetLocalPos = dir * meleeOffsetDistance;
+
+    batPivot.localPosition = Vector3.MoveTowards(
+        batPivot.localPosition,
+        targetLocalPos,
+        batMoveSpeed * Time.deltaTime
+    );
+    }
+private void StartSwing(Vector3 targetPos)
+{
+    isSwinging = true;
+    swingTimer = 0f;
+    meleeHitThisSwing = false;
+
+    Vector3 dir = (targetPos - batPivot.position).normalized;
+    float angleToTarget = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+    startAngle = angleToTarget;
+}
+
+private void UpdateSwing()
+{
+    if (!isSwinging) return;
+
+    swingTimer += Time.deltaTime;
+    float t = swingTimer / swingDuration;
+
+    if (t >= 1f)
+    {
+        isSwinging = false;
+        meleeHitThisSwing = false;
+        return;
     }
 
-    private void StartSwing(Vector3 targetPos)
+    if (!meleeHitThisSwing && t >= 0.4f)
+        PerformMeleeHit();
+
+    float curve = Mathf.Sin(t * Mathf.PI);
+
+    float currentAngle = startAngle + swingAngle * (curve - 0.5f);
+
+    batPivot.rotation = Quaternion.Euler(0f, 0f, currentAngle);
+}
+private bool IsEnemyInMeleeRange()
+{
+    int mask = enemyLayer.value;
+    if (mask == 0)
+        mask = Physics2D.DefaultRaycastLayers;
+
+    Collider2D hit = Physics2D.OverlapCircle(batPivot.position, meleeRange, mask);
+    return hit != null && hit.GetComponent<EnemyScript>() != null;
+}
+    private void PerformMeleeHit()
     {
-        isSwinging = true;
-        swingTimer = 0f;
-        startAngle = batPivot.eulerAngles.z;
-    }
+        meleeHitThisSwing = true;
 
-    private void UpdateSwing()
-    {
-        if (!isSwinging) return;
-
-        swingTimer += Time.deltaTime;
-        float t = swingTimer / swingDuration;
-
-        if (t >= 1f)
+        int layerMask = enemyLayer.value;
+        if (layerMask == 0)
         {
-            isSwinging = false;
-            return;
+            layerMask = Physics2D.DefaultRaycastLayers;
         }
 
-        float curve = Mathf.Sin(t * Mathf.PI);
-
-        float direction = (batPivot.localPosition.x >= 0) ? 1f : -1f;
-
-        float currentAngle = startAngle
-                           - direction * (swingAngle * 0.5f)
-                           + direction * swingAngle * curve;
-
-        batPivot.rotation = Quaternion.Euler(0f, 0f, currentAngle);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(batPivot.position, meleeRange, layerMask);
+        foreach (var hit in hits)
+        {
+            EnemyScript enemy = hit.GetComponent<EnemyScript>();
+            if (enemy != null)
+            {
+                enemy.TakeDamage(meleeDamage);
+            }
+        }
     }
 
     private void OnDestroy()

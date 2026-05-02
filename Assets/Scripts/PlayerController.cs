@@ -419,10 +419,8 @@ public class PlayerController : MonoBehaviour
             currentWeapon = startingWeapon;
             weaponUpgradeLevels[startingWeapon] = 0;
             weaponCount = 1;
-            // Re-apply starting weapon
             startingWeapon.Apply(this, upgrades.weaponHolder, upgrades.playerCamera, 0);
         }
-        Debug.Log("Player died!");
         gameUI.ShowDeathScreen();
     }
 
