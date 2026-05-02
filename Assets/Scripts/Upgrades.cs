@@ -20,7 +20,6 @@ public class Upgrades : ScriptableObject
 
     private void ApplyChange(PlayerController player, UpgradeChange change, Weapons weapon, int level)
     {
-        // Update player stats (not weapon-specific)
         switch (change.attribute)
         {
             case UpgradeAttribute.MoveSpeed:
@@ -34,14 +33,12 @@ public class Upgrades : ScriptableObject
                 break;
         }
 
-        // Update the active weapon instance in the scene if it exists
         if (player.weaponInstances.TryGetValue(weapon, out BatScript batInstance))
         {
             switch (change.attribute)
             {
                 case UpgradeAttribute.FireRate:
-                    // Fire rate decreases by 0.1 per upgrade (faster fire)
-                    batInstance.fireRate = Mathf.Max(0.05f, batInstance.fireRate - 0.1f * level);
+                    batInstance.fireRate = Mathf.Max(0.05f, batInstance.fireRate - 0.1f);
                     break;
                 case UpgradeAttribute.Damage:
                     batInstance.damage = (int)ApplyValue(batInstance.damage, change, level);
@@ -61,7 +58,7 @@ public class Upgrades : ScriptableObject
 
     private float ApplyValue(float currentValue, UpgradeChange change, int level)
     {
-        float scaledValue = change.value * level;
+        float scaledValue = change.value * (0.2f * level);
         switch (change.changeType)
         {
             case UpgradeChangeType.Add:

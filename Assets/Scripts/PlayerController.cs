@@ -38,6 +38,7 @@ public class PlayerController : MonoBehaviour
     public Weapons startingWeapon; 
 
     private int totalLevels = 0;
+    public int TotalLevels => totalLevels;
     public Weapons currentWeapon;
     public Dictionary<Weapons, int> weaponUpgradeLevels = new();
     public Dictionary<Weapons, BatScript> weaponInstances = new();

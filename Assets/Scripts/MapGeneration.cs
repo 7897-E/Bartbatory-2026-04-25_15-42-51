@@ -60,4 +60,102 @@ public class MapGeneration : MonoBehaviour
         return m_Grid.GetCellCenterWorld((Vector3Int)cellIndex);
     }
 
+    public Vector3 GetBorderSpawnPosition(int margin = 1)
+    {
+        if (m_Grid == null)
+            return Vector3.zero;
+
+        if (Width <= margin * 2 || Height <= margin * 2)
+            return CellToWorld(new Vector2Int(0, 0));
+
+        int x = 0;
+        int y = 0;
+        int side = Random.Range(0, 4);
+
+        switch (side)
+        {
+            case 0: // left
+                x = margin;
+                y = Random.Range(margin, Height - margin);
+                break;
+            case 1: // right
+                x = Width - margin - 1;
+                y = Random.Range(margin, Height - margin);
+                break;
+            case 2: // bottom
+                x = Random.Range(margin, Width - margin);
+                y = margin;
+                break;
+            case 3: // top
+                x = Random.Range(margin, Width - margin);
+                y = Height - margin - 1;
+                break;
+        }
+
+        return CellToWorld(new Vector2Int(x, y));
+    }
+
+    public Vector3 GetOffscreenSpawnPosition(Camera cam, float margin = 2f)
+    {
+        if (cam == null || m_Grid == null)
+            return Vector3.zero;
+
+        Vector3 bottomLeft = cam.ViewportToWorldPoint(new Vector3(0f, 0f, cam.nearClipPlane));
+        Vector3 topRight = cam.ViewportToWorldPoint(new Vector3(1f, 1f, cam.nearClipPlane));
+
+        float camMinX = bottomLeft.x;
+        float camMaxX = topRight.x;
+        float camMinY = bottomLeft.y;
+        float camMaxY = topRight.y;
+
+        Vector3 mapMin = CellToWorld(new Vector2Int(0, 0));
+        Vector3 mapMax = CellToWorld(new Vector2Int(Width - 1, Height - 1));
+
+        float mapMinX = Mathf.Min(mapMin.x, mapMax.x) - 0.5f;
+        float mapMaxX = Mathf.Max(mapMin.x, mapMax.x) + 0.5f;
+        float mapMinY = Mathf.Min(mapMin.y, mapMax.y) - 0.5f;
+        float mapMaxY = Mathf.Max(mapMin.y, mapMax.y) + 0.5f;
+
+        var validSides = new System.Collections.Generic.List<int>();
+
+        if (camMinX - margin >= mapMinX && camMinX - margin <= mapMaxX)
+            validSides.Add(0);
+        if (camMaxX + margin >= mapMinX && camMaxX + margin <= mapMaxX)
+            validSides.Add(1);
+        if (camMinY - margin >= mapMinY && camMinY - margin <= mapMaxY)
+            validSides.Add(2);
+        if (camMaxY + margin >= mapMinY && camMaxY + margin <= mapMaxY)
+            validSides.Add(3);
+
+        if (validSides.Count == 0)
+            return GetBorderSpawnPosition(margin: 1);
+
+        int side = validSides[Random.Range(0, validSides.Count)];
+        float x = 0f;
+        float y = 0f;
+
+        switch (side)
+        {
+            case 0: // left
+                x = camMinX - margin;
+                y = Random.Range(Mathf.Max(camMinY, mapMinY), Mathf.Min(camMaxY, mapMaxY));
+                break;
+            case 1: // right
+                x = camMaxX + margin;
+                y = Random.Range(Mathf.Max(camMinY, mapMinY), Mathf.Min(camMaxY, mapMaxY));
+                break;
+            case 2: // bottom
+                x = Random.Range(Mathf.Max(camMinX, mapMinX), Mathf.Min(camMaxX, mapMaxX));
+                y = camMinY - margin;
+                break;
+            case 3: // top
+                x = Random.Range(Mathf.Max(camMinX, mapMinX), Mathf.Min(camMaxX, mapMaxX));
+                y = camMaxY + margin;
+                break;
+        }
+
+        x = Mathf.Clamp(x, mapMinX, mapMaxX);
+        y = Mathf.Clamp(y, mapMinY, mapMaxY);
+        return new Vector3(x, y, 0f);
+    }
 }

@@ -46,13 +46,17 @@ public class BatScript : MonoBehaviour
     public Vector3 leftOffset = new Vector3(0f, 0f, 0f);
 
     private Transform player;
+    private PlayerController playerController;
     private EnemyScript currentTarget;
+
+    public int levelsUntilRanged = 5;
 
     private static Dictionary<BatScript, EnemyScript> weaponTargets = new();
 
     private void Awake()
     {
         player = transform.parent;
+        playerController = GetComponentInParent<PlayerController>();
 
         if (batPivot == null)
             batPivot = transform;
@@ -151,10 +155,20 @@ public class BatScript : MonoBehaviour
         switch (weaponType)
         {
             case WeaponType.Bat:
-                FireBullet(targetPos);
-                if (fireCooldown >= .175f)
+                if (playerController != null && playerController.TotalLevels < levelsUntilRanged)
                 {
-                    StartSwing(targetPos);
+                    if (fireCooldown >= .175f)
+                    {
+                        StartSwing(targetPos);
+                    }
+                }
+                else
+                {
+                    FireBullet(targetPos);
+                    if (fireCooldown >= .175f)
+                    {
+                        StartSwing(targetPos);
+                    }
                 }
                 break;
             case WeaponType.Railgun:

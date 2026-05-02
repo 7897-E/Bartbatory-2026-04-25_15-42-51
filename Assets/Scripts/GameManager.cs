@@ -125,7 +125,7 @@ public void OnBossDefeated()
             spawnInterval = 0;
         }
 
-        Vector3 spawnPos = GetOffscreenSpawnPosition();
+        Vector3 spawnPos = BoardManager != null ? BoardManager.GetOffscreenSpawnPosition(mainCam, offscreenMargin) : GetOffscreenSpawnPosition();
 
             if (spawnInterval == .1f)
 

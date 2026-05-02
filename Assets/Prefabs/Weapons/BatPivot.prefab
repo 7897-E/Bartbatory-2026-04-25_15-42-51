@@ -129,6 +129,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07c7dc9d43b9b1b46931974f201157c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponType: 0
   batPivot: {fileID: 1097412641544116147}
   firePoint: {fileID: 1049249187634044926}
   rotationSpeed: 720
@@ -139,7 +140,14 @@ MonoBehaviour:
   bounces: 0
   bulletPrefab: {fileID: 7348029680949209567, guid: f83bdde8ba53b04438405bbd9cf9dcc8, type: 3}
   cam: {fileID: 0}
+  railgunRange: 20
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  shotgunPellets: 5
+  shotgunSpread: 30
   swingAngle: 60
   swingDuration: 0.15
   rightOffset: {x: 0.5, y: 0, z: 0}
   leftOffset: {x: -0.5, y: 0, z: 0}
+  levelsUntilRanged: 3
