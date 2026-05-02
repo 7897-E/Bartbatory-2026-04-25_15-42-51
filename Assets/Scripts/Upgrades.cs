@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "NewUpgrade", menuName = "Upgrades/Upgrade Data")]
@@ -65,14 +66,14 @@ public class Upgrades : ScriptableObject
 
     private float ApplyValue(float currentValue, UpgradeChange change, int level)
     {
-        float scaledValue = change.value * (0.2f * level);
+        float scaledValue = change.value * Math.Max(0.2f * level, 1f);
         switch (change.changeType)
         {
             case UpgradeChangeType.Add:
                 return currentValue + scaledValue;
 
             case UpgradeChangeType.Multiply:
-                return currentValue * scaledValue;
+                return currentValue * change.value;
 
             case UpgradeChangeType.Set:
                 return scaledValue;

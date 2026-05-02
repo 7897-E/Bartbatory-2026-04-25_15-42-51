@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 47c51efafa983e640b55e1e877e672ed, type: 3}
-  m_Name: Bat
+  m_Name: Shotgun
   m_EditorClassIdentifier: 
-  weaponName: Bat
-  description: Baseball Bat
-  weapon: {fileID: 235369070727013317, guid: e5e7d8ee3b496b049980733ae31e99fb, type: 3}
-  fireRate: 0.3
-  meleeDamage: 15
+  weaponName: Shotgun
+  description: Shotgun
+  weapon: {fileID: 0}
+  fireRate: 0.5
+  meleeDamage: 0
   projectileDamage: 5
   bulletSpeed: 10
   MaxHits: 1

@@ -15,3 +15,10 @@ MonoBehaviour:
   weaponName: MiniGun
   description: MiniGun
   weapon: {fileID: 3583196670117962681, guid: 44d8d5c72a98fa6448bba204c5bf146f, type: 3}
+  fireRate: 0.1
+  meleeDamage: 1
+  projectileDamage: 1
+  bulletSpeed: 10
+  MaxHits: 1
+  bounces: 0
+  weaponRadius: 1

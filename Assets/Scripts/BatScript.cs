@@ -160,6 +160,7 @@ public class BatScript : MonoBehaviour
             case WeaponType.Bat:
                 if ( currentLevel >= levelsUntilRanged)
                 {
+                        StartSwing(targetPos);
                        FireBullet(targetPos);
                 }
 

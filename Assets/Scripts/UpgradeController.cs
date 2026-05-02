@@ -315,12 +315,10 @@ public class UpgradeUIController : MonoBehaviour
 
     private void OnUpgradeSelected(Upgrades upgrade, Weapons weapon)
     {
-        Debug.Log($"Selected: {upgrade.upgradeName} for {weapon.weaponName}");
 
         if (PlayerController.weaponUpgradeLevels.ContainsKey(weapon))
         {
             int level = PlayerController.weaponUpgradeLevels[weapon];
-            Debug.Log(level);
             upgrade.Apply(PlayerController, weapon, level + 1);
             PlayerController.weaponUpgradeLevels[weapon]++;
         }
