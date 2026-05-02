@@ -1,7 +1,13 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class BatScript : MonoBehaviour
 {
+    public enum WeaponType { Bat, Railgun, Shotgun }
+
+    [Header("Weapon Type")]
+    public WeaponType weaponType = WeaponType.Bat;
+
     [Header("References")]
     public Transform batPivot;     
     public Transform firePoint;    
@@ -20,8 +26,15 @@ public class BatScript : MonoBehaviour
     public Baseball bulletPrefab;
     public Camera cam;
 
+    [Header("Railgun")]
+    public float railgunRange = 20f;
+    public LayerMask enemyLayer;
 
-    [Header("Swing")]
+    [Header("Shotgun")]
+    public int shotgunPellets = 5;
+    public float shotgunSpread = 30f;
+
+    [Header("Swing (Bat only)")]
     public float swingAngle = 90f;
     public float swingDuration = 0.15f;
     private bool isSwinging = false;
@@ -33,6 +46,9 @@ public class BatScript : MonoBehaviour
     public Vector3 leftOffset = new Vector3(0f, 0f, 0f);
 
     private Transform player;
+    private EnemyScript currentTarget;
+
+    private static Dictionary<BatScript, EnemyScript> weaponTargets = new();
 
     private void Awake()
     {
@@ -45,18 +61,43 @@ public class BatScript : MonoBehaviour
     private void Update()
     {
         EnemyScript nearestEnemy = FindNearestEnemy();
-        if (nearestEnemy != null)
+        
+        if (nearestEnemy != currentTarget)
         {
-            if (!isSwinging)
+            if (currentTarget != null && weaponTargets.ContainsKey(this) && weaponTargets[this] == currentTarget)
             {
-                AimAt(nearestEnemy.transform.position);
-                UpdateSide(nearestEnemy.transform.position);
+                weaponTargets.Remove(this);
             }
-
-            AutoFire(nearestEnemy.transform.position);
+            currentTarget = nearestEnemy;
+            if (currentTarget != null)
+            {
+                weaponTargets[this] = currentTarget;
+            }
         }
 
-        UpdateSwing();
+        if (nearestEnemy != null)
+        {
+            if (!isSwinging || weaponType != WeaponType.Bat)
+            {
+                AimAt(nearestEnemy.transform.position);
+                
+            }
+
+            FireAt(nearestEnemy.transform.position);
+        }
+        else
+        {
+            if (weaponTargets.ContainsKey(this))
+            {
+                weaponTargets.Remove(this);
+            }
+            currentTarget = null;
+        }
+
+        if (weaponType == WeaponType.Bat)
+        {
+            UpdateSwing();
+        }
     }
 
     private void AimAt(Vector3 targetPos)
@@ -84,6 +125,7 @@ public class BatScript : MonoBehaviour
         foreach (var enemy in enemies)
         {
             if (enemy == null) continue;
+            if (weaponTargets.ContainsValue(enemy)) continue;
 
             float distSqr = (enemy.transform.position - currentPos).sqrMagnitude;
             if (distSqr < nearestDistSqr)
@@ -96,7 +138,7 @@ public class BatScript : MonoBehaviour
         return nearest;
     }
 
-    private void AutoFire(Vector3 targetPos)
+    private void FireAt(Vector3 targetPos)
     {
         if (fireCooldown > 0f)
         {
@@ -106,6 +148,26 @@ public class BatScript : MonoBehaviour
 
         fireCooldown = fireRate;
 
+        switch (weaponType)
+        {
+            case WeaponType.Bat:
+                FireBullet(targetPos);
+                if (fireCooldown >= .175f)
+                {
+                    StartSwing(targetPos);
+                }
+                break;
+            case WeaponType.Railgun:
+                FireRailgun(targetPos);
+                break;
+            case WeaponType.Shotgun:
+                FireShotgun(targetPos);
+                break;
+        }
+    }
+
+    private void FireBullet(Vector3 targetPos)
+    {
         Transform spawnTransform = firePoint != null ? firePoint : batPivot;
 
         Vector3 dir = (targetPos - spawnTransform.position).normalized;
@@ -118,9 +180,41 @@ public class BatScript : MonoBehaviour
         );
 
         bullet.Init(dir, damage, bulletSpeed, MaxHits, bounces, cam);
-        if (fireCooldown >= .175)
+    }
+
+    private void FireRailgun(Vector3 targetPos)
+    {
+        Transform spawnTransform = firePoint != null ? firePoint : batPivot;
+        Vector3 dir = (targetPos - spawnTransform.position).normalized;
+
+        RaycastHit2D hit = Physics2D.Raycast(spawnTransform.position, dir, railgunRange, enemyLayer);
+        if (hit.collider != null)
         {
-            StartSwing(targetPos);
+            EnemyScript enemy = hit.collider.GetComponent<EnemyScript>();
+            if (enemy != null)
+            {
+                enemy.TakeDamage(damage);
+            }
+        }
+    }
+
+    private void FireShotgun(Vector3 targetPos)
+    {
+        Transform spawnTransform = firePoint != null ? firePoint : batPivot;
+        Vector3 baseDir = (targetPos - spawnTransform.position).normalized;
+
+        for (int i = 0; i < shotgunPellets; i++)
+        {
+            float angleOffset = Random.Range(-shotgunSpread / 2f, shotgunSpread / 2f) * Mathf.Deg2Rad;
+            Vector3 dir = Quaternion.Euler(0, 0, angleOffset * Mathf.Rad2Deg) * baseDir;
+
+            Baseball bullet = Instantiate(
+                bulletPrefab,
+                spawnTransform.position,
+                Quaternion.LookRotation(Vector3.forward, dir)
+            );
+
+            bullet.Init(dir, damage, bulletSpeed, MaxHits, bounces, cam);
         }
     }
 
@@ -158,7 +252,7 @@ public class BatScript : MonoBehaviour
             return;
         }
 
-        float curve = Mathf.Sin(t * Mathf.PI); // 0 -> 1 -> 0
+        float curve = Mathf.Sin(t * Mathf.PI);
 
         float direction = (batPivot.localPosition.x >= 0) ? 1f : -1f;
 
@@ -167,5 +261,13 @@ public class BatScript : MonoBehaviour
                            + direction * swingAngle * curve;
 
         batPivot.rotation = Quaternion.Euler(0f, 0f, currentAngle);
+    }
+
+    private void OnDestroy()
+    {
+        if (weaponTargets.ContainsKey(this))
+        {
+            weaponTargets.Remove(this);
+        }
     }
 }

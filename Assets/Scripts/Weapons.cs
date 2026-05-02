@@ -9,7 +9,7 @@ public class Weapons : ScriptableObject
     public string description;
     public GameObject weapon;
 
-    public GameObject Apply(PlayerController playerController, Transform weaponHolder, Camera playerCamera)
+    public GameObject Apply(PlayerController playerController, Transform weaponHolder, Camera playerCamera, int weaponIndex = 0)
     {
         if (weapon == null)
         {
@@ -25,6 +25,11 @@ public class Weapons : ScriptableObject
         GameObject weaponPivot = Instantiate(weapon);
 
         weaponPivot.transform.SetParent(weaponHolder, worldPositionStays: false);
+        
+        float radius = 0.5f;
+        int totalWeapons = playerController.weaponCount;
+        float angle = (weaponIndex / (float)totalWeapons) * 360f * Mathf.Deg2Rad;
+        weaponPivot.transform.localPosition = new Vector3(radius * Mathf.Cos(angle), radius * Mathf.Sin(angle), 0); 
 
         BatScript bat = weaponPivot.GetComponentInChildren<BatScript>();
         if (bat == null)

@@ -15,6 +15,8 @@ public class MapGeneration : MonoBehaviour
     public int Height = 50;
     public Tile[] GroundTiles;
     public Tile[] WallTiles;
+    public Tilemap tilemap { get { return m_Tilemap; } }
+    public Tile[] wallTiles { get { return WallTiles; } }
     public Tile[] ObstacleTiles;
 
     public void Init()

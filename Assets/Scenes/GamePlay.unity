@@ -373,11 +373,10 @@ Transform:
   m_GameObject: {fileID: 159124791}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 80, y: 5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 431128046}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &159124794
@@ -400,6 +399,10 @@ MonoBehaviour:
   dashCooldown: 0.7
   currentXP: 50
   maxXP: 100
+  levelsForWeapon: 1
+  startingWeapon: {fileID: 11400000, guid: d34df1847a2870a4cb6fd7f0f89b16a1, type: 2}
+  currentWeapon: {fileID: 0}
+  weaponCount: 0
   uiDocumentObject: {fileID: 2068173648}
   barAnimationSpeed: 8
   gameUI: {fileID: 642669533}
@@ -652,17 +655,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &267449372 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6526919547013809852, guid: e5e7d8ee3b496b049980733ae31e99fb, type: 3}
-  m_PrefabInstance: {fileID: 1315218448}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 07c7dc9d43b9b1b46931974f201157c6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &272732158
 GameObject:
   m_ObjectHideFlags: 0
@@ -703,6 +695,8 @@ MonoBehaviour:
   spawnInterval: 0.6
   offscreenMargin: 7
   Scaling: 25
+  postBossSpawnInterval: 0.4
+  PostBossScaling: 25
 --- !u!4 &272732160
 Transform:
   m_ObjectHideFlags: 0
@@ -942,11 +936,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 346752403}
   m_CullTransparentMesh: 1
---- !u!4 &431128046 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1097412641544116147, guid: e5e7d8ee3b496b049980733ae31e99fb, type: 3}
-  m_PrefabInstance: {fileID: 1315218448}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -1172,6 +1161,7 @@ GameObject:
   - component: {fileID: 752940214}
   - component: {fileID: 752940216}
   - component: {fileID: 752940215}
+  - component: {fileID: 752940217}
   m_Layer: 0
   m_Name: Tilemap
   m_TagString: Untagged
@@ -1305,6 +1295,42 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!19719996 &752940217
+TilemapCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 752940213}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_MaximumTileChangeCount: 1000
+  m_ExtrusionFactor: 0
+  m_UseDelaunayMesh: 0
 --- !u!1 &807058779
 GameObject:
   m_ObjectHideFlags: 0
@@ -2086,81 +2112,16 @@ MonoBehaviour:
   - {fileID: 11400000, guid: d651d5416bd95004a981d4a459e38810, type: 2}
   - {fileID: 11400000, guid: c1caf9699425ae84aa02902d0d2f0949, type: 2}
   choicesPerLevel: 3
+  allWeapons:
+  - {fileID: 11400000, guid: d34df1847a2870a4cb6fd7f0f89b16a1, type: 2}
+  - {fileID: 11400000, guid: db0ebc3c59cff444385b9b96784dfe7d, type: 2}
+  isWeaponMode: 0
+  upgradeTitle: Select Upgrade
+  weaponTitle: Select New Weapon
   PlayerController: {fileID: 159124794}
-  BatScript: {fileID: 267449372}
---- !u!1001 &1315218448
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 159124793}
-    m_Modifications:
-    - target: {fileID: 235369070727013317, guid: e5e7d8ee3b496b049980733ae31e99fb, type: 3}
-      propertyPath: m_Name
-      value: BatPivot
-      objectReference: {fileID: 0}
-    - target: {fileID: 1049249187634044926, guid: e5e7d8ee3b496b049980733ae31e99fb, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0.531
-      objectReference: {fileID: 0}
-    - target: {fileID: 1049249187634044926, guid: e5e7d8ee3b496b049980733ae31e99fb, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.47
-      objectReference: {fileID: 0}
-    - target: {fileID: 1097412641544116147, guid: e5e7d8ee3b496b049980733ae31e99fb, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0.35
-      objectReference: {fileID: 0}
-    - target: {fileID: 1097412641544116147, guid: e5e7d8ee3b496b049980733ae31e99fb, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 1097412641544116147, guid: e5e7d8ee3b496b049980733ae31e99fb, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1097412641544116147, guid: e5e7d8ee3b496b049980733ae31e99fb, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1097412641544116147, guid: e5e7d8ee3b496b049980733ae31e99fb, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1097412641544116147, guid: e5e7d8ee3b496b049980733ae31e99fb, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1097412641544116147, guid: e5e7d8ee3b496b049980733ae31e99fb, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1097412641544116147, guid: e5e7d8ee3b496b049980733ae31e99fb, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1097412641544116147, guid: e5e7d8ee3b496b049980733ae31e99fb, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1097412641544116147, guid: e5e7d8ee3b496b049980733ae31e99fb, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6526919547013809852, guid: e5e7d8ee3b496b049980733ae31e99fb, type: 3}
-      propertyPath: cam
-      value: 
-      objectReference: {fileID: 519420031}
-    - target: {fileID: 6526919547013809852, guid: e5e7d8ee3b496b049980733ae31e99fb, type: 3}
-      propertyPath: bulletPrefab
-      value: 
-      objectReference: {fileID: 7348029680949209567, guid: f83bdde8ba53b04438405bbd9cf9dcc8, type: 3}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: e5e7d8ee3b496b049980733ae31e99fb, type: 3}
+  BatScript: {fileID: 0}
+  weaponHolder: {fileID: 159124793}
+  playerCamera: {fileID: 519420031}
 --- !u!1 &1337946444
 GameObject:
   m_ObjectHideFlags: 0
@@ -2439,10 +2400,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c8bc71dd04aa3894bb8b17107c568bb9, type: 2}
   ObstacleTiles:
   - {fileID: 11400000, guid: 3c38d9a157b70b04e84ce8597a8e025a, type: 2}
-  numRooms: 500
-  minRoomSize: 50
-  maxRoomSize: 100
-  roomMargin: 1
 --- !u!1 &1836304232
 GameObject:
   m_ObjectHideFlags: 0

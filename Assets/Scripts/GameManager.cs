@@ -21,7 +21,7 @@ public class GameManager : MonoBehaviour
     public GameObject endScreenUI;
 void Update()
     {
-        Debug.Log("Update is running");
+
         if(Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame){
             if (isPaused)
             {

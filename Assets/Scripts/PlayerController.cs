@@ -33,6 +33,14 @@ public class PlayerController : MonoBehaviour
     [Header("XP")]
     public int currentXP = 0;
     public int maxXP = 100;
+    public int levelsForWeapon = 5; 
+
+    public Weapons startingWeapon; 
+
+    private int totalLevels = 0;
+    public Weapons currentWeapon;
+    public Dictionary<Weapons, int> weaponUpgradeLevels = new();
+    public int weaponCount = 0;
 
     [Header("UI")]
     public GameObject uiDocumentObject;
@@ -67,6 +75,16 @@ public class PlayerController : MonoBehaviour
 
         currentHealth = maxHealth;
         currentXP = 0;
+        totalLevels = 0;
+        weaponUpgradeLevels.Clear();
+        weaponCount = 0;
+        if (startingWeapon != null)
+        {
+            currentWeapon = startingWeapon;
+            weaponUpgradeLevels[startingWeapon] = 0;
+            weaponCount = 1;
+            startingWeapon.Apply(this, upgrades.weaponHolder, upgrades.playerCamera, 0);
+        }
         activeMoveSpeed = moveSpeed;
         dashSpeed = moveSpeed * 2.5f;
         _trailRenderer = GetComponent<TrailRenderer>();
@@ -358,13 +376,41 @@ public class PlayerController : MonoBehaviour
         currentHealth = maxHealth;
 
         maxXP += (maxXP + (int)(maxXP * 0.3));
-        upgrades.ShowRandomUpgrades();
+        totalLevels++;
+        if (totalLevels % levelsForWeapon == 0)
+        {
+            upgrades.isWeaponMode = true;
+        }
+        else
+        {
+            upgrades.isWeaponMode = false;
+        }
+
+        upgrades.ShowChoices(this);
         UpdateBarLimits();
     }
 
     private void Die()
     {
-        currentXP= 0;
+        currentXP = 0;
+        totalLevels = 0;
+        weaponUpgradeLevels.Clear();
+        weaponCount = 0;
+        if (upgrades.weaponHolder != null)
+        {
+            foreach (Transform child in upgrades.weaponHolder)
+            {
+                Destroy(child.gameObject);
+            }
+        }
+        if (startingWeapon != null)
+        {
+            currentWeapon = startingWeapon;
+            weaponUpgradeLevels[startingWeapon] = 0;
+            weaponCount = 1;
+            // Re-apply starting weapon
+            startingWeapon.Apply(this, upgrades.weaponHolder, upgrades.playerCamera, 0);
+        }
         Debug.Log("Player died!");
         gameUI.ShowDeathScreen();
     }
