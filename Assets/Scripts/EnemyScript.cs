@@ -32,6 +32,8 @@ public class EnemyScript : MonoBehaviour
     public Sprite rightSprite;
 
     private SpriteRenderer sr;
+    private Rigidbody2D rb;
+    private float activeFollowSpeed;
 
     [Header("Shooting (Boss Only)")]
     public bool canShoot = false;
@@ -68,20 +70,49 @@ public class EnemyScript : MonoBehaviour
     private void Start()
     {
         sr = GetComponent<SpriteRenderer>();
+        rb = GetComponent<Rigidbody2D>();
+
+        if (rb != null)
+        {
+            rb.gravityScale = 0f;
+            rb.freezeRotation = true;
+            rb.bodyType = RigidbodyType2D.Dynamic;
+        }
+
+        activeFollowSpeed = followSpeed;
     }
 
     private void LateUpdate()
     {
         if (target == null) return;
 
-        Vector3 previousPosition = transform.position;
+        Vector3 previousPosition = rb != null ? (Vector3)rb.position : transform.position;
 
         Vector3 desiredPosition = target.position + offset;
-        transform.position = Vector3.MoveTowards(
-            transform.position,
-            desiredPosition,
-            followSpeed * Time.deltaTime
-        );
+        Vector2 desiredPosition2D = new Vector2(desiredPosition.x, desiredPosition.y);
+        Vector2 currentPosition = rb != null ? rb.position : (Vector2)transform.position;
+        Vector2 direction = desiredPosition2D - currentPosition;
+        Vector2 velocity = Vector2.zero;
+
+        if (direction.sqrMagnitude > 0.0001f)
+        {
+            Vector2 moveInput = direction.normalized;
+            activeFollowSpeed = Mathf.Lerp(activeFollowSpeed, followSpeed, Time.deltaTime * 10f);
+            velocity = moveInput * activeFollowSpeed;
+        }
+
+        if (rb != null)
+        {
+            rb.velocity = velocity;
+        }
+        else
+        {
+            transform.position = Vector3.MoveTowards(
+                transform.position,
+                desiredPosition,
+                followSpeed * Time.deltaTime
+            );
+        }
 
   
         Vector2 moveDir = (transform.position - previousPosition);

@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
     private float activeMoveSpeed;
 
     private Vector3 m_TargetWorldPos;
-    private bool m_IsMoving = false;
+
 
     [Header("Player Stats")]
     public int maxHealth = 10;
@@ -118,11 +118,11 @@ public class PlayerController : MonoBehaviour
         if (snapInstantly)
         {
             transform.position = m_TargetWorldPos;
-            m_IsMoving = false;
+            
         }
         else
         {
-            m_IsMoving = true;
+            
         }
     }
 
