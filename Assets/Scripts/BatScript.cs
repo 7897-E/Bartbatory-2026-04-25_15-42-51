@@ -17,7 +17,7 @@ public class BatScript : MonoBehaviour
     public float bulletSpeed = 10f;
     public int MaxHits = 1;
     public int bounces = 0;
-    public BulletScript bulletPrefab;
+    public Baseball bulletPrefab;
     public Camera cam;
 
 
@@ -111,7 +111,7 @@ public class BatScript : MonoBehaviour
         Vector3 dir = (targetPos - spawnTransform.position).normalized;
         Quaternion rot = Quaternion.LookRotation(Vector3.forward, dir);
 
-        BulletScript bullet = Instantiate(
+        Baseball bullet = Instantiate(
             bulletPrefab,
             spawnTransform.position,
             rot

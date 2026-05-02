@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -9,6 +10,7 @@ public class PlayerController : MonoBehaviour
     private Vector2Int m_CellPosition;
 
     public float moveSpeed = 5f;
+    private float activeMoveSpeed;
 
     private Vector3 m_TargetWorldPos;
     private bool m_IsMoving = false;
@@ -16,6 +18,17 @@ public class PlayerController : MonoBehaviour
     [Header("Player Stats")]
     public int maxHealth = 10;
     public int currentHealth;
+
+    [Header("Dash stats")]
+    public float dashSpeed;
+    public float dashLength = .05f, dashCooldown = .15f;
+    private float dashCounter;
+    private float dashCoolCounter;
+    private TrailRenderer _trailRenderer;
+
+    private bool m_IsDashing = false;
+    private Vector3 m_DashDirection = Vector3.zero;
+    private float dashRecoverSpeed = 10f;
 
     [Header("XP")]
     public int currentXP = 0;
@@ -32,9 +45,12 @@ public class PlayerController : MonoBehaviour
     private UIDocument uiDocument;
     private ProgressBar healthBar;
     private ProgressBar xpBar;
+    private ProgressBar CD;
 
     private float displayedHealth;
     private float displayedXP;
+    private float displayedCD;
+    public DamageFlash damageFlash;
 
     private class EnemyData
     {
@@ -51,6 +67,9 @@ public class PlayerController : MonoBehaviour
 
         currentHealth = maxHealth;
         currentXP = 0;
+        activeMoveSpeed = moveSpeed;
+        dashSpeed = moveSpeed * 2.5f;
+        _trailRenderer = GetComponent<TrailRenderer>();
 
         SetupUI();
     }
@@ -71,26 +90,76 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+
+
     private void Update()
     {
         if (Keyboard.current == null) return;
 
         Vector2 input = Vector2.zero;
 
-        if (Keyboard.current.upArrowKey.isPressed)
+        if (Keyboard.current.upArrowKey.isPressed || Keyboard.current.wKey.isPressed)
             input.y += 1f;
-        if (Keyboard.current.downArrowKey.isPressed)
+        if (Keyboard.current.downArrowKey.isPressed || Keyboard.current.sKey.isPressed)
             input.y -= 1f;
-        if (Keyboard.current.rightArrowKey.isPressed)
+        if (Keyboard.current.rightArrowKey.isPressed || Keyboard.current.dKey.isPressed)
             input.x += 1f;
-        if (Keyboard.current.leftArrowKey.isPressed)
+        if (Keyboard.current.leftArrowKey.isPressed || Keyboard.current.aKey.isPressed)
             input.x -= 1f;
 
-        if (input.sqrMagnitude > 1f)
-            input = input.normalized;
+        if (Keyboard.current.leftShiftKey.isPressed)
+        {
+            if (dashCounter <= 0f && dashCoolCounter <= 0f)
+            {
+                m_IsDashing = true;
+                activeMoveSpeed = dashSpeed;
 
-        Vector3 delta = new Vector3(input.x, input.y, 0f) * moveSpeed * Time.deltaTime;
-        transform.position += delta;
+                dashCoolCounter = dashLength;   
+                dashCounter = dashCooldown; 
+
+                _trailRenderer.emitting = true;
+
+                Vector2 dir2 = input.sqrMagnitude > 0f
+                    ? input.normalized
+                    : new Vector2(transform.right.x, transform.right.y);
+
+                m_DashDirection = new Vector3(dir2.x, dir2.y, 0f);
+            }
+        }
+
+        if (dashCoolCounter > 0f)
+        {
+            dashCoolCounter -= Time.deltaTime;
+            if (dashCoolCounter <= 0f)
+            {
+                dashCoolCounter = 0f;
+                m_IsDashing = false;
+                _trailRenderer.emitting = false;
+            }
+        }
+
+        if (dashCounter > 0f)
+        {
+            dashCounter -= Time.deltaTime;
+            if (dashCounter < 0f) dashCounter = 0f;
+        }
+
+        if (!m_IsDashing)
+        {
+
+            if (input.sqrMagnitude > 1f)
+                input = input.normalized;
+
+            activeMoveSpeed = Mathf.Lerp(activeMoveSpeed, moveSpeed, Time.deltaTime * dashRecoverSpeed);
+
+            Vector3 delta = new Vector3(input.x, input.y, 0f) * activeMoveSpeed * Time.deltaTime;
+            transform.position += delta;
+        }
+        else
+        {
+
+            transform.position += m_DashDirection * dashSpeed * Time.deltaTime;
+        }
 
         if (m_IsMoving)
         {
@@ -110,6 +179,7 @@ public class PlayerController : MonoBehaviour
         UpdateDamages();
         AnimateBars();
     }
+
 
     private void SetupUI()
     {
@@ -131,6 +201,7 @@ public class PlayerController : MonoBehaviour
 
         healthBar = root.Q<ProgressBar>("HealthBar");
         xpBar = root.Q<ProgressBar>("XPBar");
+        CD = root.Q<ProgressBar>("DashCooldown");
 
         if (healthBar == null)
             Debug.LogError("Could not find ProgressBar named HealthBar");
@@ -138,10 +209,15 @@ public class PlayerController : MonoBehaviour
         if (xpBar == null)
             Debug.LogError("Could not find ProgressBar named XPBar");
 
+        if (CD == null)
+            Debug.LogError("Could not find ProgressBar named XPBar");
+
         displayedHealth = currentHealth;
         displayedXP = currentXP;
+        displayedCD = dashCooldown - dashCounter;
+        
 
-        UpdateBarLimits();
+    UpdateBarLimits();
         ForceUpdateBars();
     }
 
@@ -158,6 +234,11 @@ public class PlayerController : MonoBehaviour
             xpBar.lowValue = 0;
             xpBar.highValue = maxXP;
         }
+        if (CD != null)
+        {
+            CD.lowValue = 0;
+            CD.highValue = dashCooldown;
+        }
     }
 
     private void ForceUpdateBars()
@@ -172,6 +253,11 @@ public class PlayerController : MonoBehaviour
         {
             xpBar.value = displayedXP;
             xpBar.title = currentXP + " / " + maxXP;
+        }
+        if (CD != null)
+        {
+            CD.value = displayedCD;
+            CD.title = currentXP + " / " + maxXP;
         }
     }
 
@@ -199,6 +285,17 @@ public class PlayerController : MonoBehaviour
 
             xpBar.value = displayedXP;
             xpBar.title = currentXP + " / " + maxXP;
+        }
+        if (CD != null)
+        {
+            displayedCD = Mathf.Lerp(
+                displayedCD,
+                dashCoolCounter,
+                Time.deltaTime * barAnimationSpeed
+            );
+
+            CD.value = dashCooldown - dashCounter;
+            CD.title = currentXP + " / " + maxXP;
         }
     }
 
@@ -229,7 +326,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void TakeDamage(int amount)
+    public void TakeDamage(int amount)
     {
         currentHealth -= amount;
 
@@ -240,6 +337,7 @@ public class PlayerController : MonoBehaviour
         }
 
         UpdateBarLimits();
+        damageFlash.TriggerFlash();
     }
 
     public void AddXP(int amount)
@@ -275,6 +373,7 @@ public class PlayerController : MonoBehaviour
     {
         EnemyScript enemy = collision.gameObject.GetComponent<EnemyScript>();
         XPOrb xpOrb = collision.gameObject.GetComponent<XPOrb>();
+        BossBall bad = collision.gameObject.GetComponent<BossBall>();
         if (enemy != null)
         {
             bool alreadyTracked = false;
@@ -303,6 +402,11 @@ public class PlayerController : MonoBehaviour
         {
             AddXP(xpOrb.XPValue);
             Destroy(xpOrb.gameObject);
+        }
+        if(bad != null)
+        {
+            
+            TakeDamage(bad.damage);
         }
     }
 

@@ -1,6 +1,8 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
@@ -14,7 +16,49 @@ public class GameManager : MonoBehaviour
     [Header("UI")]
     public UIDocument gameUIDocument;
     public float fadeInDuration = 1.5f;
-
+    public GameObject pauseMenu;
+    private bool isPaused;
+    public GameObject endScreenUI;
+void Update()
+    {
+        Debug.Log("Update is running");
+        if(Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame){
+            if (isPaused)
+            {
+                ResumeGame();
+            }
+            else
+            {
+                PauseGame();
+            }
+        }
+    
+    }
+public void PauseGame()
+{
+        pauseMenu.SetActive(true);
+        Time.timeScale = 0f;
+        isPaused = true;
+}
+public void ResumeGame()
+{
+        pauseMenu.SetActive(false);
+        Time.timeScale = 1f;
+        isPaused = false;
+}
+public void GoToMainMenu()
+{
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("MainMenu");
+}
+public void QuitGame()
+    {
+        Application.Quit();
+    }
+    public void StartGame()
+    {
+        
+    }
 private VisualElement fadeScreen;
     [Header("Spawn Settings")]
     public float spawnInterval = 3f;   
@@ -26,9 +70,17 @@ private VisualElement fadeScreen;
     {
         mainCam = Camera.main;
     }
+public void OnBossDefeated()
+    {
+        Debug.Log("Boss defeated!");
 
+        endScreenUI.SetActive(true);
+
+        Time.timeScale = 0f; // pause game
+    }
     void Start()
 {
+    pauseMenu.SetActive(false);
     if (gameUIDocument != null)
     {
         fadeScreen = gameUIDocument.rootVisualElement.Q<VisualElement>("FadeScreen");
@@ -45,10 +97,8 @@ private VisualElement fadeScreen;
     PlayerController.Spawn(BoardManager, new Vector2Int(80, 5));
     StartCoroutine(SpawnEnemiesLoop());
 }
-    public void StartGame()
-    {
-        
-    }
+
+    
 
     private IEnumerator SpawnEnemiesLoop()
 {
@@ -75,6 +125,12 @@ private VisualElement fadeScreen;
 
         Vector3 spawnPos = GetOffscreenSpawnPosition();
 
+            if (spawnInterval == .5)
+
+            {
+                enemySpawner.SpawnBossBulk(BoardManager, PlayerController.transform, spawnPos, PlayerController);
+                break;
+            }
         if (spawnInterval <= 0.3f)
 {
     int randomEnemy = Random.Range(0, 3);
@@ -91,6 +147,7 @@ private VisualElement fadeScreen;
     {
         enemySpawner.SpawnBulk(BoardManager, PlayerController.transform, spawnPos, PlayerController);
     }
+
 }
 else if (spawnInterval <= 0.4f)
 {
@@ -110,6 +167,7 @@ else
 
         count++;
     }
+    
 }
 
     private Vector3 GetOffscreenSpawnPosition()
