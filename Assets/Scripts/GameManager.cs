@@ -64,6 +64,8 @@ private VisualElement fadeScreen;
     public float spawnInterval = 3f;   
     public float offscreenMargin = 2f;
     public int Scaling = 10;
+    public float postBossSpawnInterval = 2f;
+    public int PostBossScaling = 5;
     private Camera mainCam;
 
     void Awake()
@@ -76,7 +78,7 @@ public void OnBossDefeated()
 
         endScreenUI.SetActive(true);
 
-        Time.timeScale = 0f; // pause game
+        Time.timeScale = 0f;
     }
     void Start()
 {
@@ -125,11 +127,15 @@ public void OnBossDefeated()
 
         Vector3 spawnPos = GetOffscreenSpawnPosition();
 
-            if (spawnInterval == .5)
+            if (spawnInterval == .1f)
 
             {
+                ClearEnemies();
                 enemySpawner.SpawnBossBulk(BoardManager, PlayerController.transform, spawnPos, PlayerController);
-                break;
+                spawnInterval = postBossSpawnInterval;
+                Scaling = PostBossScaling;
+                count = 0;
+                // Continue spawning instead of breaking
             }
         if (spawnInterval <= 0.3f)
 {
@@ -203,6 +209,15 @@ else
                 break;
         }
         return new Vector3(x, y, 0f);
+    }
+
+    private void ClearEnemies()
+    {
+        EnemyScript[] enemies = FindObjectsOfType<EnemyScript>();
+        foreach (EnemyScript enemy in enemies)
+        {
+            Destroy(enemy.gameObject);
+        }
     }
     private IEnumerator FadeInFromBlack()
 {
