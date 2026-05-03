@@ -105,7 +105,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 9
+  m_SortingOrder: 11
   m_Sprite: {fileID: 21300000, guid: fb161956ae86d4444aea197a04aa61fe, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -129,10 +129,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07c7dc9d43b9b1b46931974f201157c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponType: 0
   batPivot: {fileID: 1097412641544116147}
   firePoint: {fileID: 1049249187634044926}
   rotationSpeed: 720
+  bulletPrefab: {fileID: 7348029680949209567, guid: f83bdde8ba53b04438405bbd9cf9dcc8, type: 3}
+  cam: {fileID: 0}
+  currentLevel: 0
+  meleeOffsetDistance: 1
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 1
+  batMoveSpeed: 10
+  weaponType: 0
   fireRate: 0.3
   meleeDamage: 1
   projectileDamage: 1
@@ -140,20 +148,11 @@ MonoBehaviour:
   bulletSpeed: 10
   MaxHits: 1
   bounces: 0
-  bulletPrefab: {fileID: 7348029680949209567, guid: f83bdde8ba53b04438405bbd9cf9dcc8, type: 3}
-  cam: {fileID: 0}
-  railgunRange: 20
-  enemyLayer:
-    serializedVersion: 2
-    m_Bits: 1
   shotgunPellets: 5
   shotgunSpread: 30
   ShotgunRange: 10
   swingAngle: 90
   swingDuration: 0.15
   levelsUntilRanged: 1
-  currentLevel: 0
-  meleeOffsetDistance: 1
-  batMoveSpeed: 10
   rightOffset: {x: 0.5, y: 0, z: 0}
   leftOffset: {x: -0.5, y: 0, z: 0}

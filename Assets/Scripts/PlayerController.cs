@@ -43,7 +43,7 @@ public class PlayerController : MonoBehaviour
     public Dictionary<Weapons, int> weaponUpgradeLevels = new();
     public Dictionary<Weapons, BatScript> weaponInstances = new();
     public int weaponCount = 0;
-
+    
     [Header("UI")]
     public GameObject uiDocumentObject;
     public float barAnimationSpeed = 8f;
@@ -62,6 +62,14 @@ public class PlayerController : MonoBehaviour
     private float displayedCD;
     public DamageFlash damageFlash;
 
+    [Header("Sprites")]
+    public Sprite upSprite;
+    public Sprite downSprite;
+    public Sprite leftSprite;
+    public Sprite rightSprite;
+    public float scale = 1f;
+
+    private SpriteRenderer sr;
     private Rigidbody2D rb;
     private Vector2 moveInput = Vector2.zero;
 
@@ -75,6 +83,7 @@ public class PlayerController : MonoBehaviour
 
     public void Spawn(MapGeneration MapGeneration, Vector2Int cell)
     {
+        sr = GetComponent<SpriteRenderer>();
         m_Board = MapGeneration;
         MoveTo(cell, snapInstantly: true);
 
@@ -136,14 +145,19 @@ public class PlayerController : MonoBehaviour
         moveInput = Vector2.zero;
 
         if (Keyboard.current.upArrowKey.isPressed || Keyboard.current.wKey.isPressed)
-            moveInput.y += 1f;
+            moveInput.y += 1f;  
         if (Keyboard.current.downArrowKey.isPressed || Keyboard.current.sKey.isPressed)
-            moveInput.y -= 1f;
+            moveInput.y -= 1f;  
         if (Keyboard.current.rightArrowKey.isPressed || Keyboard.current.dKey.isPressed)
-            moveInput.x += 1f;
-        if (Keyboard.current.leftArrowKey.isPressed || Keyboard.current.aKey.isPressed)
-            moveInput.x -= 1f;
+            moveInput.x += 1f;  
 
+        if (Keyboard.current.leftArrowKey.isPressed || Keyboard.current.aKey.isPressed)
+            moveInput.x -= 1f;  
+        if (moveInput.sqrMagnitude > 0f){
+            sr.sprite = moveInput.x > 0f ? rightSprite : moveInput.x < 0f ? leftSprite : moveInput.y > 0f ? upSprite : downSprite;  
+            Vector3 scaleVector = new Vector3(scale, scale, 1f);
+            sr.transform.localScale = scaleVector;
+        }
         if (Keyboard.current.leftShiftKey.isPressed)
         {
             if (dashCounter <= 0f && dashCoolCounter <= 0f)
