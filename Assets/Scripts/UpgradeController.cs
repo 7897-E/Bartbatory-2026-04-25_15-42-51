@@ -10,6 +10,7 @@ public class UpgradeUIController : MonoBehaviour
 
     [Header("Upgrades")]
     public Upgrades[] allUpgrades;
+    public List<Upgrades> defualtUpgrades = new List<Upgrades>();
     public int choicesPerLevel = 3;
 
     [Header("Weapons")]
@@ -87,14 +88,14 @@ public class UpgradeUIController : MonoBehaviour
         {
             foreach (var upgrade in allUpgrades)
             {
+                if(weapon.Compatibleupgrades.Contains(upgrade))
                 upgradePool.Add((upgrade, weapon));
             }
         }
 
-        if (upgradePool.Count == 0)
+        foreach(var upgrade in defualtUpgrades)
         {
-            Debug.LogWarning("No weapons available for upgrades.");
-            return;
+            upgradePool.Add((upgrade, null));
         }
 
         int count = Mathf.Min(choicesPerLevel, upgradePool.Count);
@@ -217,7 +218,14 @@ public class UpgradeUIController : MonoBehaviour
         }
 
         button.text = $"{upgrade.upgradeName}";
-        descriptionText.text = $"{upgrade.description}\n({weapon.weaponName})";
+        if(weapon != null)
+        {
+            descriptionText.text = $"{upgrade.description}\n({weapon.weaponName})";
+        }
+        else
+        {
+            descriptionText.text = upgrade.description;
+        }
 
         descriptionPanel.style.display = DisplayStyle.None;
 
@@ -331,11 +339,14 @@ public class UpgradeUIController : MonoBehaviour
     private void OnUpgradeSelected(Upgrades upgrade, Weapons weapon)
     {
 
-        if (PlayerController.weaponUpgradeLevels.ContainsKey(weapon))
+        if (PlayerController.weaponUpgradeLevels.ContainsKey(weapon) && weapon != null)
         {
             int level = PlayerController.weaponUpgradeLevels[weapon];
             upgrade.Apply(PlayerController, weapon, level + 1);
             PlayerController.weaponUpgradeLevels[weapon]++;
+        }else if(weapon == null)
+        {
+            upgrade.Apply(PlayerController, null, -1);
         }
         else
         {

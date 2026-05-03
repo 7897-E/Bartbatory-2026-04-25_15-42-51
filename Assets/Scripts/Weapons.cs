@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "NewWeapon", menuName = "Weapon")]
@@ -33,7 +35,8 @@ public class Weapons : ScriptableObject
     public float swingDuration = 0.15f;
     public int levelsUntilRanged = 5;
     
-
+    [Header("Upgrades")]
+    public List<Upgrades> Compatibleupgrades = new List<Upgrades>();
     public GameObject Apply(PlayerController playerController, Transform weaponHolder, Camera playerCamera, int weaponIndex = 0)
     {
         if (weapon == null)

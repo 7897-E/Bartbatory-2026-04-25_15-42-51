@@ -10,13 +10,15 @@ public class Upgrades : ScriptableObject
     public string description;
 
     public UpgradeChange[] changes;
-    private int level;
 
     public void Apply(PlayerController playerController, Weapons weapon, int level)
     {
-        this.level = level;
         foreach (var change in changes)
         {
+            if(level <= 0)
+            {
+                level = 1;
+            }
             ApplyChange(playerController, change, weapon, level);
         }
     }
@@ -60,6 +62,18 @@ public class Upgrades : ScriptableObject
                     batInstance.bounces = (int)ApplyValue(batInstance.bounces, change, level);
                     batInstance.currentLevel = level;
                     break;
+                case UpgradeAttribute.Range:
+                    batInstance.meleeRange = ApplyValue(batInstance.meleeRange, change, level);
+                    batInstance.currentLevel = level;
+                    break;
+                case UpgradeAttribute.Spread:
+                    batInstance.shotgunSpread = ApplyValue(batInstance.shotgunSpread, change, level);
+                    batInstance.currentLevel = level;
+                    break;
+                case UpgradeAttribute.PelletCount:
+                    batInstance.shotgunPellets = (int)ApplyValue(batInstance.shotgunPellets, change, level);
+                    batInstance.currentLevel = level;
+                    break;
             }
         }
     }
@@ -93,7 +107,10 @@ public enum UpgradeAttribute
     FireRate,
     ProjectileSpeed,
     MaxHits,
-    Bounces
+    Bounces,
+    Range,
+    Spread,
+    PelletCount
 
 }
 
