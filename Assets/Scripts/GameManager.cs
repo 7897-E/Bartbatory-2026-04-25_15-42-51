@@ -61,7 +61,7 @@ public void QuitGame()
     }
     private VisualElement fadeScreen;
     [Header("Spawn Settings")]
-    public float spawnInterval = 3f;   
+    private float spawnInterval = 3f;   
     public float spawnIntervalOrginal = 3f;
     public float offscreenMargin = 2f;
     private int Scaling = 10;

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -338,15 +339,16 @@ public class UpgradeUIController : MonoBehaviour
 
     private void OnUpgradeSelected(Upgrades upgrade, Weapons weapon)
     {
+        if(weapon==null)
+        {
+            upgrade.Apply(PlayerController, null, -1);
 
-        if (PlayerController.weaponUpgradeLevels.ContainsKey(weapon) && weapon != null)
+        }
+         else if (weapon != null && PlayerController.weaponUpgradeLevels.ContainsKey(weapon))
         {
             int level = PlayerController.weaponUpgradeLevels[weapon];
             upgrade.Apply(PlayerController, weapon, level + 1);
             PlayerController.weaponUpgradeLevels[weapon]++;
-        }else if(weapon == null)
-        {
-            upgrade.Apply(PlayerController, null, -1);
         }
         else
         {

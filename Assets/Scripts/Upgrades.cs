@@ -38,7 +38,7 @@ public class Upgrades : ScriptableObject
                 break;
         }
 
-        if (player.weaponInstances.TryGetValue(weapon, out BatScript batInstance))
+        if (weapon != null && player.weaponInstances.TryGetValue(weapon, out BatScript batInstance))
         {
             switch (change.attribute)
             {
