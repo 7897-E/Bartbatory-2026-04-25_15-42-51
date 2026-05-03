@@ -33,7 +33,6 @@ public class UpgradeUIController : MonoBehaviour
     private readonly List<VisualElement> spawnedCards = new();
     private readonly Dictionary<Button, VisualElement> dropdownPanels = new();
     
-    // Store upgrade-weapon pairs for tracking which weapon each upgrade applies to
     private readonly List<(Upgrades upgrade, Weapons weapon)> currentUpgradeChoices = new();
     private readonly Dictionary<Button, (Upgrades upgrade, Weapons weapon)> buttonToUpgradeWeaponPair = new();
 

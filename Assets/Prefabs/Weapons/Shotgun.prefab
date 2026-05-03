@@ -135,7 +135,7 @@ MonoBehaviour:
   rotationSpeed: 720
   fireRate: 0.3
   meleeDamage: 1
-  projectileDamage: 1
+  projectileDamage: 5
   meleeRange: 1
   bulletSpeed: 10
   MaxHits: 1
@@ -148,6 +148,7 @@ MonoBehaviour:
     m_Bits: 1
   shotgunPellets: 5
   shotgunSpread: 30
+  ShotgunRange: 0.5
   swingAngle: 60
   swingDuration: 0.3
   levelsUntilRanged: 1

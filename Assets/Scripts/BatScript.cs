@@ -35,6 +35,7 @@ public class BatScript : MonoBehaviour
     [Header("Shotgun")]
     public int shotgunPellets = 5;
     public float shotgunSpread = 30f;
+    public float ShotgunRange = 10f;
 
     [Header("Swing (Bat only)")]
     public float swingAngle = 90f;
@@ -191,7 +192,7 @@ public class BatScript : MonoBehaviour
             rot
         );
 
-        bullet.Init(dir, projectileDamage, bulletSpeed, MaxHits, bounces, cam);
+        bullet.Init(dir, projectileDamage, bulletSpeed, MaxHits, bounces, cam, false, 0);
     }
 
     private void FireRailgun(Vector3 targetPos)
@@ -226,7 +227,7 @@ public class BatScript : MonoBehaviour
                 Quaternion.LookRotation(Vector3.forward, dir)
             );
 
-            bullet.Init(dir, projectileDamage, bulletSpeed, MaxHits, bounces, cam);
+            bullet.Init(dir, projectileDamage, bulletSpeed, MaxHits, bounces, cam, true, ShotgunRange);
         }
     }
 

@@ -13,16 +13,20 @@ public class Baseball : MonoBehaviour
     private Camera cam;
     private float destroyDistance = .5f;
     private Vector3 _direction = Vector3.up; 
+    private bool shotgunMode = false;
+    private float shotgunCounter = 0f;
    
 
-    public void Init(Vector3 direction, int damages, float speed, int maxHits, int bounces, Camera camera)
+    public void Init(Vector3 direction, int damages, float speed, int maxHits, int bounces, Camera camera, bool shotgun, float shotgunCount)
     {
         _direction = direction.normalized;
         damage = damages;
         this.speed = speed;
         this.maxHits = maxHits;
+        this.shotgunMode = shotgun;
         bouncesLeft = bounces;
         cam = camera;
+        shotgunCounter = shotgunCount;
     }
     private void OnBecameInvisible()
     {
@@ -32,14 +36,16 @@ public class Baseball : MonoBehaviour
     private void Update()
 {
     transform.position += _direction * speed * Time.deltaTime;
-
+    
     Vector3 viewportPos = cam.WorldToViewportPoint(transform.position);
+        shotgunCounter-= Time.deltaTime;
 
     if (viewportPos.x < -destroyDistance || viewportPos.x > 1 + destroyDistance ||
-        viewportPos.y < -destroyDistance || viewportPos.y > 1 + destroyDistance)
+        viewportPos.y < -destroyDistance || viewportPos.y > 1 + destroyDistance || (shotgunMode && shotgunCounter <= 0))
     {
         Destroy(gameObject);
     }
+    
 }
 
     private void OnTriggerEnter2D(Collider2D other)
