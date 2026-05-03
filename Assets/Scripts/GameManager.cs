@@ -59,13 +59,17 @@ public void QuitGame()
     {
         
     }
-private VisualElement fadeScreen;
+    private VisualElement fadeScreen;
     [Header("Spawn Settings")]
     public float spawnInterval = 3f;   
+    public float spawnIntervalOrginal = 3f;
     public float offscreenMargin = 2f;
-    public int Scaling = 10;
+    private int Scaling = 10;
+    public int ScalingOrginal = 10;
     public float postBossSpawnInterval = 2f;
     public int PostBossScaling = 5;
+    public bool done = false;
+    public int level = 1;
     private Camera mainCam;
 
     void Awake()
@@ -74,17 +78,12 @@ private VisualElement fadeScreen;
     }
 public void OnBossDefeated()
     {
-        Debug.Log("Boss defeated!");
-
-        endScreenUI.SetActive(true);
-
-        Time.timeScale = 0f;
-    }
-    void Start()
-{
-    pauseMenu.SetActive(false);
-    if (gameUIDocument != null)
-    {
+        ClearEnemies();
+        ClearXp();
+        ClearProjectiles();
+        done = true;
+        Scaling = ScalingOrginal;
+        spawnInterval = spawnIntervalOrginal;
         fadeScreen = gameUIDocument.rootVisualElement.Q<VisualElement>("FadeScreen");
 
         if (fadeScreen != null)
@@ -93,20 +92,39 @@ public void OnBossDefeated()
             fadeScreen.style.opacity = 1f;
             StartCoroutine(FadeInFromBlack());
         }
-    }
+        PlayerController.Spawn(BoardManager, new Vector2Int(80, 5));
+        done = false;
+        StartCoroutine(SpawnEnemiesLoop(level++));
 
-    BoardManager.Init();
-    PlayerController.Spawn(BoardManager, new Vector2Int(80, 5));
-    StartCoroutine(SpawnEnemiesLoop());
-}
+    }
+    void Start()
+    {
+        pauseMenu.SetActive(false);
+        if (gameUIDocument != null)
+        {
+            fadeScreen = gameUIDocument.rootVisualElement.Q<VisualElement>("FadeScreen");
+
+            if (fadeScreen != null)
+            {
+                fadeScreen.style.display = DisplayStyle.Flex;
+                fadeScreen.style.opacity = 1f;
+                StartCoroutine(FadeInFromBlack());
+            }
+        }
+    spawnInterval = spawnIntervalOrginal;
+    Scaling = ScalingOrginal;
+        BoardManager.Init();
+        PlayerController.Spawn(BoardManager, new Vector2Int(80, 5));
+        StartCoroutine(SpawnEnemiesLoop(1));
+    }
 
     
 
-    private IEnumerator SpawnEnemiesLoop()
+    private IEnumerator SpawnEnemiesLoop(int level)
 {
     int count = 0;
 
-    while (true)
+    while (!done)
     {
         yield return new WaitForSeconds(spawnInterval);
 
@@ -127,15 +145,14 @@ public void OnBossDefeated()
 
         Vector3 spawnPos = BoardManager != null ? BoardManager.GetOffscreenSpawnPosition(mainCam, offscreenMargin) : GetOffscreenSpawnPosition();
 
-            if (spawnInterval == .1f)
+            if (spawnInterval <= .1f)
 
             {
                 ClearEnemies();
-                enemySpawner.SpawnBossBulk(BoardManager, PlayerController.transform, spawnPos, PlayerController);
+                enemySpawner.SpawnBossBulk(BoardManager, PlayerController.transform, spawnPos, PlayerController, level);
                 spawnInterval = postBossSpawnInterval;
                 Scaling = PostBossScaling;
                 count = 0;
-                // Continue spawning instead of breaking
             }
         if (spawnInterval <= 0.3f)
 {
@@ -143,15 +160,15 @@ public void OnBossDefeated()
 
     if (randomEnemy == 0)
     {
-        enemySpawner.SpawnZomb(BoardManager, PlayerController.transform, spawnPos, PlayerController);
+        enemySpawner.SpawnZomb(BoardManager, PlayerController.transform, spawnPos, PlayerController, level);
     }
     else if (randomEnemy == 1)
     {
-        enemySpawner.SpawnCheetah(BoardManager, PlayerController.transform, spawnPos, PlayerController);
+        enemySpawner.SpawnCheetah(BoardManager, PlayerController.transform, spawnPos, PlayerController, level);
     }
     else
     {
-        enemySpawner.SpawnBulk(BoardManager, PlayerController.transform, spawnPos, PlayerController);
+        enemySpawner.SpawnBulk(BoardManager, PlayerController.transform, spawnPos, PlayerController, level);
     }
 
 }
@@ -159,16 +176,16 @@ else if (spawnInterval <= 0.4f)
 {
     if (Random.value < 0.5f)
     {
-        enemySpawner.SpawnZomb(BoardManager, PlayerController.transform, spawnPos, PlayerController);
+        enemySpawner.SpawnZomb(BoardManager, PlayerController.transform, spawnPos, PlayerController, level);
     }
     else
     {
-        enemySpawner.SpawnCheetah(BoardManager, PlayerController.transform, spawnPos, PlayerController);
+        enemySpawner.SpawnCheetah(BoardManager, PlayerController.transform, spawnPos, PlayerController, level);
     }
 }
 else
 {
-    enemySpawner.SpawnZomb(BoardManager, PlayerController.transform, spawnPos, PlayerController);
+    enemySpawner.SpawnZomb(BoardManager, PlayerController.transform, spawnPos, PlayerController, level);
 }
 
         count++;
@@ -217,6 +234,27 @@ else
         foreach (EnemyScript enemy in enemies)
         {
             Destroy(enemy.gameObject);
+        }
+    }
+    private void ClearXp()
+    
+    {
+        XPOrb[] xps = FindObjectsOfType<XPOrb>();
+        foreach (XPOrb xp in xps)
+        {
+            Destroy(xp.gameObject);
+        }
+    }
+    private void ClearProjectiles()
+    {
+        Baseball[] projectiles = FindObjectsOfType<Baseball>();
+        foreach (Baseball proj in projectiles)
+        {
+            Destroy(proj.gameObject);
+        }
+        BossBall[] bossProjectiles = FindObjectsOfType<BossBall>();
+        foreach (BossBall proj in bossProjectiles)        {
+            Destroy(proj.gameObject);
         }
     }
     private IEnumerator FadeInFromBlack()

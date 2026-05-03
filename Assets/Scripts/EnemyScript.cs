@@ -46,19 +46,19 @@ public class EnemyScript : MonoBehaviour
     public int bulletsPerShot = 5;          
     public float fanAngle = 60f;
 
-
-    public void Init(MapGeneration mapGeneration, Transform targetTransform, int h, PlayerController playerCharacter, float followSpeed, int Zombdamage, float ZombCooldown, int xp, bool canShoot, float shootCooldown, BossBall Projectile, Camera camera, float speed, int projectileDamage = 0)
+    public int level =0;
+    public void Init(MapGeneration mapGeneration, Transform targetTransform, int h, PlayerController playerCharacter, float followSpeed, int Zombdamage, float ZombCooldown, int xp, bool canShoot, float shootCooldown, BossBall Projectile, Camera camera, float speed, int projectileDamage, int level = 1)
     {
-        this.followSpeed = followSpeed;
-        this.Damage = Zombdamage;
-        this.cooldown = ZombCooldown;
+        this.followSpeed = followSpeed * (1 + 0.1f * (level - 1));
+        this.Damage = (int)(Zombdamage * (1 + .1f * (level - 1)));
+        this.cooldown = ZombCooldown * Mathf.Max(0.5f, 1 - 0.05f * (level - 1));
 
         m_Board = mapGeneration;
         target = targetTransform;
-        maxHealth = h;
+        maxHealth = h* level;
         currentHealth = maxHealth;
         PlayerCharacter = playerCharacter;
-        XP = xp;
+        XP = xp * level;
         this.canShoot = canShoot;
         projectilePrefab= Projectile;
         this.shootCooldown = shootCooldown;

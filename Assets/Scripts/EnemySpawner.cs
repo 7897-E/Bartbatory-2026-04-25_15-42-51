@@ -36,25 +36,26 @@ public class EnemySpawner : MonoBehaviour
     public float BossBulkCooldown;
     public Camera cam;
     
-    public EnemyScript SpawnZomb(MapGeneration map, Transform target, Vector3 position, PlayerController playerCharacter)
+    
+    public EnemyScript SpawnZomb(MapGeneration map, Transform target, Vector3 position, PlayerController playerCharacter, int level)
     {
         EnemyScript enemyInstance = Instantiate(ZombPrefab, position, Quaternion.identity);
-        enemyInstance.Init(map, target, ZombHealth, playerCharacter, ZombfollowSpeed, Zombdamage, ZombCooldown, ZombXp,false, 0f, projectile, cam, projectileSpeed, 0);
+        enemyInstance.Init(map, target, ZombHealth, playerCharacter, ZombfollowSpeed, Zombdamage, ZombCooldown, ZombXp,false, 0f, projectile, cam, projectileSpeed, 0, level);
         return enemyInstance;
     }
-    public EnemyScript SpawnCheetah(MapGeneration map, Transform target, Vector3 position, PlayerController playerCharacter)
+    public EnemyScript SpawnCheetah(MapGeneration map, Transform target, Vector3 position, PlayerController playerCharacter, int level)
     {
         EnemyScript enemyInstance = Instantiate(CheetahPrefab, position, Quaternion.identity);
-        enemyInstance.Init(map, target, CheetahHealth, playerCharacter, CheetahfollowSpeed, Cheetahdamage, CheetahCooldown, CheetahXp,false, 0f, projectile, cam, projectileSpeed, 0);
+        enemyInstance.Init(map, target, CheetahHealth, playerCharacter, CheetahfollowSpeed, Cheetahdamage, CheetahCooldown, CheetahXp,false, 0f, projectile, cam, projectileSpeed, 0, level);
         return enemyInstance;
     }
-    public EnemyScript SpawnBulk(MapGeneration map, Transform target, Vector3 position, PlayerController playerCharacter)
+    public EnemyScript SpawnBulk(MapGeneration map, Transform target, Vector3 position, PlayerController playerCharacter, int level)
     {
         EnemyScript enemyInstance = Instantiate(BulkPrefab, position, Quaternion.identity);
-        enemyInstance.Init(map, target, BulkHealth, playerCharacter, BulKFallowSpeed, Bulkdamage, BulkCooldown, BulkXp, false,0f, projectile, cam, projectileSpeed, 0);
+        enemyInstance.Init(map, target, BulkHealth, playerCharacter, BulKFallowSpeed, Bulkdamage, BulkCooldown, BulkXp, false,0f, projectile, cam, projectileSpeed, 0, level);
         return enemyInstance;
     }
-    public EnemyScript SpawnBossBulk(MapGeneration map, Transform target, Vector3 position, PlayerController playerCharacter)
+    public EnemyScript SpawnBossBulk(MapGeneration map, Transform target, Vector3 position, PlayerController playerCharacter, int level)
     {
         EnemyScript enemyInstance = Instantiate(BossBulkPrefab, position, Quaternion.identity);
 
@@ -63,7 +64,7 @@ public class EnemySpawner : MonoBehaviour
         enemyInstance.gameManager = FindObjectOfType<GameManager>();
         enemyInstance.canShoot = true;
 
-        enemyInstance.Init(map, target, BossBulkHealth, playerCharacter, BossBulKFallowSpeed, BossBulkdamage, BossBulkCooldown, BossBulkXp, true, .7f , projectile,cam, projectileSpeed, BossProjectileDamage);
+        enemyInstance.Init(map, target, BossBulkHealth, playerCharacter, BossBulKFallowSpeed, BossBulkdamage, BossBulkCooldown, BossBulkXp, true, .7f , projectile,cam, projectileSpeed, BossProjectileDamage, level);
 
         
 
