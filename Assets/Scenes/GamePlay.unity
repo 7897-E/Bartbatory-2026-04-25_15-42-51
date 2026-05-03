@@ -266,7 +266,7 @@ MonoBehaviour:
   currentXP: 50
   maxXP: 100
   levelsForWeapon: 5
-  startingWeapon: {fileID: 11400000, guid: 7ebba0daf532a1e41bebf06c9fd53268, type: 2}
+  startingWeapon: {fileID: 11400000, guid: d34df1847a2870a4cb6fd7f0f89b16a1, type: 2}
   currentWeapon: {fileID: 0}
   weaponCount: 0
   uiDocumentObject: {fileID: 2068173648}
