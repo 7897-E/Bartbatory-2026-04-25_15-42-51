@@ -16,49 +16,6 @@ public class GameManager : MonoBehaviour
     [Header("UI")]
     public UIDocument gameUIDocument;
     public float fadeInDuration = 1.5f;
-    public GameObject pauseMenu;
-    private bool isPaused;
-    public GameObject endScreenUI;
-void Update()
-    {
-
-        if(Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame){
-            if (isPaused)
-            {
-                ResumeGame();
-            }
-            else
-            {
-                PauseGame();
-            }
-        }
-    
-    }
-public void PauseGame()
-{
-        pauseMenu.SetActive(true);
-        Time.timeScale = 0f;
-        isPaused = true;
-}
-public void ResumeGame()
-{
-        pauseMenu.SetActive(false);
-        Time.timeScale = 1f;
-        isPaused = false;
-}
-public void GoToMainMenu()
-{
-        Time.timeScale = 1f;
-        SceneManager.LoadScene("MainMenu");
-}
-public void QuitGame()
-    {
-        Application.Quit();
-    }
-    public void StartGame()
-    {
-        
-    }
     private VisualElement fadeScreen;
     [Header("Spawn Settings")]
     private float spawnInterval = 3f;   
@@ -84,6 +41,10 @@ public void OnBossDefeated()
         done = true;
         Scaling = ScalingOrginal;
         spawnInterval = spawnIntervalOrginal;
+        if(level == 2)
+        {
+            PlayerController.EndScreen();
+        }
         fadeScreen = gameUIDocument.rootVisualElement.Q<VisualElement>("FadeScreen");
 
         if (fadeScreen != null)
@@ -99,7 +60,6 @@ public void OnBossDefeated()
     }
     void Start()
     {
-        pauseMenu.SetActive(false);
         if (gameUIDocument != null)
         {
             fadeScreen = gameUIDocument.rootVisualElement.Q<VisualElement>("FadeScreen");

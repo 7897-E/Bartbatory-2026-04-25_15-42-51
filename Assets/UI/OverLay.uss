@@ -1,47 +1,68 @@
-#HealthBar,
-#DashCooldown,
+#HealthBar {
+    height: 18px;
+    border-radius: 9px;
+    overflow: hidden;
+    border-width: 2px;
+    border-color: rgb(17, 17, 17);
+}
+
+#DashCooldown {
+    height: 18px;
+    border-radius: 9px;
+    overflow: hidden;
+    border-width: 2px;
+    border-color: rgb(17, 17, 17);
+}
+
 #XPBar {
     height: 18px;
     border-radius: 9px;
     overflow: hidden;
     border-width: 2px;
-    border-color: #111;
+    border-color: rgb(17, 17, 17);
 }
 
-/* Hide text */
-#HealthBar .unity-progress-bar__title,
+#HealthBar .unity-progress-bar__title {
+    display: none;
+}
+
 #XPBar .unity-progress-bar__title {
     display: none;
 }
 
-/* Health */
 #HealthBar .unity-progress-bar__background {
-    background-color: #3a1f1f;
+    background-color: rgb(58, 31, 31);
     border-radius: 9px;
 }
 
 #HealthBar .unity-progress-bar__progress {
-    background-color: #d83a3a;
+    background-color: rgb(216, 58, 58);
     border-radius: 9px;
 }
 
-/* XP */
 #XPBar .unity-progress-bar__background {
-    background-color: #242424;
+    background-color: rgb(36, 36, 36);
     border-radius: 9px;
 }
 
 #XPBar .unity-progress-bar__progress {
-    background-color: #9a9a9a;
+    background-color: rgb(154, 154, 154);
     border-radius: 9px;
 }
-/* CD */
+
 #DashCooldown .unity-progress-bar__background {
-    background-color: #242424;
+    background-color: rgb(36, 36, 36);
     border-radius: 9px;
 }
 
 #DashCooldown .unity-progress-bar__progress {
-    background-color: #9a9a9a;
+    background-color: rgb(154, 154, 154);
     border-radius: 9px;
+}
+
+#PauseMenu {
+    display: none;
+}
+#EndScreen {
+    display: none;
 }

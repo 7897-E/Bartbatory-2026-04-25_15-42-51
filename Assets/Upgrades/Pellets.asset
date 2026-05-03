@@ -12,6 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04d722b645db23e4fa422492040f6e38, type: 3}
   m_Name: Pellets
   m_EditorClassIdentifier: 
-  upgradeName: 
-  description: 
-  changes: []
+  upgradeName: MultiShot
+  description: Increases BulletCount
+  changes:
+  - attribute: 10
+    changeType: 0
+    value: 1

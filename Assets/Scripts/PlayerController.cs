@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 public class PlayerController : MonoBehaviour
@@ -49,6 +50,7 @@ public class PlayerController : MonoBehaviour
     public float barAnimationSpeed = 8f;
 
     public GameUI gameUI;
+    public bool isPaused = false;
 
     public UpgradeUIController upgrades;
 
@@ -158,6 +160,16 @@ public class PlayerController : MonoBehaviour
             Vector3 scaleVector = new Vector3(scale, scale, 1f);
             sr.transform.localScale = scaleVector;
         }
+        if(Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame){
+            if (isPaused)
+            {
+                ResumeGame();
+            }
+            else
+            {
+                PauseGame();
+            }
+        }
         if (Keyboard.current.leftShiftKey.isPressed)
         {
             if (dashCounter <= 0f && dashCoolCounter <= 0f)
@@ -199,6 +211,8 @@ public class PlayerController : MonoBehaviour
         AnimateBars();
     }
 
+
+
     private void FixedUpdate()
     {
         if (rb == null) return;
@@ -222,8 +236,40 @@ public class PlayerController : MonoBehaviour
 
         rb.velocity = velocity;
     }
-
-
+    private void PauseGame()
+    {
+        VisualElement PauseMenu = uiDocument.rootVisualElement.Q<VisualElement>("PauseMenu");
+        if (PauseMenu != null)
+        {
+            PauseMenu.style.display = DisplayStyle.Flex;
+            Time.timeScale = 0f;
+            isPaused = true;
+        }
+        else
+        {
+            Debug.LogError("Could not find PauseMenu in UI Document!");
+        }
+    }
+    private void ResumeGame()
+    {
+        VisualElement PauseMenu = uiDocument.rootVisualElement.Q<VisualElement>("PauseMenu");
+        if (PauseMenu != null)
+        {
+            PauseMenu.style.display = DisplayStyle.None;
+            Time.timeScale = 1f;
+            isPaused = false;
+        }
+        else
+        {
+            Debug.LogError("Could not find PauseMenu in UI Document!");
+        }
+    }
+    public void EndScreen()
+    {
+        VisualElement root = uiDocument.rootVisualElement;
+        VisualElement EndScreen = root.Q<VisualElement>("EndScreen");
+        EndScreen.style.display = DisplayStyle.Flex;
+    }   
     private void SetupUI()
     {
         if (uiDocumentObject == null)
@@ -231,6 +277,8 @@ public class PlayerController : MonoBehaviour
             Debug.LogError("UI Document GameObject is not assigned!");
             return;
         }
+
+
 
         uiDocument = uiDocumentObject.GetComponent<UIDocument>();
 
@@ -245,7 +293,14 @@ public class PlayerController : MonoBehaviour
         healthBar = root.Q<ProgressBar>("HealthBar");
         xpBar = root.Q<ProgressBar>("XPBar");
         CD = root.Q<ProgressBar>("DashCooldown");
-
+        VisualElement PauseMenu = root.Q<VisualElement>("PauseMenu");
+        PauseMenu.style.display = DisplayStyle.None;
+        PauseMenu.Q<Button>("Resume").clicked += () => ResumeGame();
+        PauseMenu.Q<Button>("MainMenu").clicked += () => SceneManager.LoadScene("MainMenu");
+        PauseMenu.Q<Button>("QuitGame").clicked += () => Application.Quit();
+        VisualElement EndScreen = root.Q<VisualElement>("EndScreen");
+        EndScreen.style.display = DisplayStyle.None;
+        EndScreen.Q<Button>("Restart").clicked += () => SceneManager.LoadScene(SceneManager.GetActiveScene().name);;
         if (healthBar == null)
             Debug.LogError("Could not find ProgressBar named HealthBar");
 

@@ -408,10 +408,12 @@ public class UpgradeUIController : MonoBehaviour
     public void Show()
     {
         root.style.display = DisplayStyle.Flex;
+        Time.timeScale = 0f;
     }
 
     public void Hide()
     {
         root.style.display = DisplayStyle.None;
+        Time.timeScale = 1f;
     }
 }

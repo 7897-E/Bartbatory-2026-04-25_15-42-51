@@ -20,7 +20,7 @@ MonoBehaviour:
   meleeDamage: 15
   projectileDamage: 5
   meleeRange: 1
-  weaponRadius: 1
+  weaponRadius: 0.5
   bulletSpeed: 10
   MaxHits: 1
   bounces: 0
@@ -30,3 +30,9 @@ MonoBehaviour:
   swingAngle: 90
   swingDuration: 0.15
   levelsUntilRanged: 1
+  Compatibleupgrades:
+  - {fileID: 11400000, guid: c1caf9699425ae84aa02902d0d2f0949, type: 2}
+  - {fileID: 11400000, guid: e6e919bdaa05de84e97cd902ecc8ab97, type: 2}
+  - {fileID: 11400000, guid: 4781fe90ad750f24183f320ca2d75b95, type: 2}
+  - {fileID: 11400000, guid: e458d9d55a39b8e489d439e98d7b865f, type: 2}
+  - {fileID: 11400000, guid: d651d5416bd95004a981d4a459e38810, type: 2}

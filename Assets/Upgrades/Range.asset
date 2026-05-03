@@ -12,6 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04d722b645db23e4fa422492040f6e38, type: 3}
   m_Name: Range
   m_EditorClassIdentifier: 
-  upgradeName: 
-  description: 
-  changes: []
+  upgradeName: Range
+  description: Increases Range
+  changes:
+  - attribute: 8
+    changeType: 0
+    value: 0.1

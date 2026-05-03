@@ -15,12 +15,12 @@ MonoBehaviour:
   weaponName: Shotgun
   description: Shotgun
   weapon: {fileID: 235369070727013317, guid: 0014527b3e70fb640a6468c708efddb8, type: 3}
-  weaponType: 0
+  weaponType: 2
   fireRate: 0.5
   meleeDamage: 0
   projectileDamage: 5
   meleeRange: 1
-  weaponRadius: 1
+  weaponRadius: 0.5
   bulletSpeed: 10
   MaxHits: 1
   bounces: 0
@@ -29,4 +29,13 @@ MonoBehaviour:
   ShotgunRange: 0.5
   swingAngle: 90
   swingDuration: 0.6
-  levelsUntilRanged: 2
+  levelsUntilRanged: 0
+  Compatibleupgrades:
+  - {fileID: 11400000, guid: c1caf9699425ae84aa02902d0d2f0949, type: 2}
+  - {fileID: 11400000, guid: e6e919bdaa05de84e97cd902ecc8ab97, type: 2}
+  - {fileID: 11400000, guid: 4781fe90ad750f24183f320ca2d75b95, type: 2}
+  - {fileID: 11400000, guid: e458d9d55a39b8e489d439e98d7b865f, type: 2}
+  - {fileID: 11400000, guid: d651d5416bd95004a981d4a459e38810, type: 2}
+  - {fileID: 11400000, guid: 49f73486b99f9624092981d34864dac1, type: 2}
+  - {fileID: 11400000, guid: 28a171cfe678f854e8533db576e2cb94, type: 2}
+  - {fileID: 11400000, guid: 2db6dab743f5ad04cab734a28664f3a2, type: 2}
