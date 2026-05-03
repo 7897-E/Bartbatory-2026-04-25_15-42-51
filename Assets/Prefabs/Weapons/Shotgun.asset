@@ -15,10 +15,18 @@ MonoBehaviour:
   weaponName: Shotgun
   description: Shotgun
   weapon: {fileID: 235369070727013317, guid: 0014527b3e70fb640a6468c708efddb8, type: 3}
+  weaponType: 0
   fireRate: 0.5
   meleeDamage: 0
   projectileDamage: 5
+  meleeRange: 1
+  weaponRadius: 1
   bulletSpeed: 10
   MaxHits: 1
   bounces: 0
-  weaponRadius: 1
+  shotgunPellets: 5
+  shotgunSpread: 30
+  ShotgunRange: 0.5
+  swingAngle: 90
+  swingDuration: 0.6
+  levelsUntilRanged: 2

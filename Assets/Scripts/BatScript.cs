@@ -3,41 +3,41 @@ using System.Collections.Generic;
 
 public class BatScript : MonoBehaviour
 {
-    public enum WeaponType { Bat, Railgun, Shotgun }
-
-    [Header("Weapon Type")]
-    public WeaponType weaponType = WeaponType.Bat;
-
+    public enum WeaponType { Bat, Minigun, Shotgun }
     [Header("References")]
     public Transform batPivot;     
     public Transform firePoint;    
 
     [Header("Rotation / Aim")]
     public float rotationSpeed = 720f;
+    [Header("Bullet")]
+    public Baseball bulletPrefab;
+    public Camera cam;
+    public int currentLevel = 0;
+    public float meleeOffsetDistance = 1.5f;   
+    public LayerMask enemyLayer;
+    [Header("Movement bat only")]
+    public float batMoveSpeed = 10f;  
+    [Header("Weapon Type Inherited")]
+    public WeaponType weaponType = WeaponType.Bat;
 
-    [Header("Firing")]
+    [Header("Firing inherited")]
     public float fireRate = 0.3f;
     private float fireCooldown = 0f;
     public int meleeDamage = 1;
     public int projectileDamage = 1;
     public float meleeRange = 1f;
-    [Header("Bullet")]
+    [Header("Bullet inherited")]
     public float bulletSpeed = 10f;
     public int MaxHits = 1;
     public int bounces = 0;
-    public Baseball bulletPrefab;
-    public Camera cam;
 
-    [Header("Railgun")]
-    public float railgunRange = 20f;
-    public LayerMask enemyLayer;
-
-    [Header("Shotgun")]
+    [Header("Shotgun Inherited")]
     public int shotgunPellets = 5;
     public float shotgunSpread = 30f;
     public float ShotgunRange = 10f;
 
-    [Header("Swing (Bat only)")]
+    [Header("Swing (Bat only) inherited")]
     public float swingAngle = 90f;
     public float swingDuration = 0.15f;
     private bool isSwinging = false;
@@ -45,10 +45,7 @@ public class BatScript : MonoBehaviour
     private float startAngle;
     public int levelsUntilRanged = 5;
 
-    public int currentLevel = 0;
-    public float meleeOffsetDistance = 1.5f;   
-    [Header("Movement bat only")]
-    public float batMoveSpeed = 10f;   
+     
 
     [Header("Side Offset (relative to player)")]
     public Vector3 rightOffset = new Vector3(0f, 0f, 0f);
@@ -58,13 +55,12 @@ public class BatScript : MonoBehaviour
     private EnemyScript currentTarget;
     private bool meleeHitThisSwing;
 
-
     private static Dictionary<BatScript, EnemyScript> weaponTargets = new();
 
     private void Awake()
     {
         player = transform.parent;
-
+        
         if (batPivot == null)
             batPivot = transform;
     }
@@ -170,8 +166,8 @@ public class BatScript : MonoBehaviour
                     StartSwing(targetPos);
                 }
                 break;
-            case WeaponType.Railgun:
-                FireRailgun(targetPos);
+            case WeaponType.Minigun:
+                FireBullet(targetPos);
                 break;
             case WeaponType.Shotgun:
                 FireShotgun(targetPos);
@@ -194,22 +190,8 @@ public class BatScript : MonoBehaviour
 
         bullet.Init(dir, projectileDamage, bulletSpeed, MaxHits, bounces, cam, false, 0);
     }
-
-    private void FireRailgun(Vector3 targetPos)
-    {
-        Transform spawnTransform = firePoint != null ? firePoint : batPivot;
-        Vector3 dir = (targetPos - spawnTransform.position).normalized;
-
-        RaycastHit2D hit = Physics2D.Raycast(spawnTransform.position, dir, railgunRange, enemyLayer);
-        if (hit.collider != null)
-        {
-            EnemyScript enemy = hit.collider.GetComponent<EnemyScript>();
-            if (enemy != null)
-            {
-                enemy.TakeDamage(projectileDamage);
-            }
-        }
-    }
+ 
+        
 
     private void FireShotgun(Vector3 targetPos)
     {

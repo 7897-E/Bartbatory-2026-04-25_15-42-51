@@ -15,10 +15,18 @@ MonoBehaviour:
   weaponName: Bat
   description: Baseball Bat
   weapon: {fileID: 235369070727013317, guid: e5e7d8ee3b496b049980733ae31e99fb, type: 3}
+  weaponType: 0
   fireRate: 0.3
   meleeDamage: 15
   projectileDamage: 5
+  meleeRange: 1
+  weaponRadius: 1
   bulletSpeed: 10
   MaxHits: 1
   bounces: 0
-  weaponRadius: 1
+  shotgunPellets: 5
+  shotgunSpread: 30
+  ShotgunRange: 10
+  swingAngle: 90
+  swingDuration: 0.15
+  levelsUntilRanged: 1

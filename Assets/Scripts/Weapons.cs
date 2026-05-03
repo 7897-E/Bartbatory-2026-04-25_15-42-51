@@ -8,12 +8,8 @@ public class Weapons : ScriptableObject
     [TextArea]
     public string description;
     public GameObject weapon;
-    public enum WeaponType
-    {
-        Bat,
-        Shotgun,
-        Minigun
-    }
+    public enum WeaponType { Bat, Minigun, Shotgun }
+
     public WeaponType weaponType;
     [Header("Firing")]
     public float fireRate = 0.3f;
@@ -79,6 +75,7 @@ public class Weapons : ScriptableObject
         bat.levelsUntilRanged = levelsUntilRanged;
         bat.swingAngle = swingAngle;
         bat.swingDuration = swingDuration;
+        bat.weaponType = (BatScript.WeaponType)weaponType;
 
         if (playerCamera != null)
         {
