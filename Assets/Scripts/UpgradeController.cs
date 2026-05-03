@@ -139,7 +139,23 @@ public class UpgradeUIController : MonoBehaviour
         ClearCards();
         currentWeaponChoices.Clear();
 
-        int count = Mathf.Min(choicesPerLevel, allWeapons.Length);
+        List<Weapons> availableWeapons = new();
+
+        foreach (Weapons weapon in allWeapons)
+        {
+            if (weapon != null && !PlayerController.weaponUpgradeLevels.ContainsKey(weapon))
+            {
+                availableWeapons.Add(weapon);
+            }
+        }
+
+        if (availableWeapons.Count == 0)
+        {
+            Debug.LogWarning("No new weapons available.");
+            return;
+        }
+
+        int count = Mathf.Min(choicesPerLevel, availableWeapons.Count);
         HashSet<int> usedIndexes = new();
 
         for (int i = 0; i < count; i++)
@@ -148,12 +164,12 @@ public class UpgradeUIController : MonoBehaviour
 
             do
             {
-                index = Random.Range(0, allWeapons.Length);
+                index = Random.Range(0, availableWeapons.Count);
             }
             while (usedIndexes.Contains(index));
 
             usedIndexes.Add(index);
-            currentWeaponChoices.Add(allWeapons[index]);
+            currentWeaponChoices.Add(availableWeapons[index]);
         }
 
         Show();
@@ -335,6 +351,14 @@ public class UpgradeUIController : MonoBehaviour
 
     private void OnWeaponSelected(Weapons data)
     {
+        if (PlayerController.weaponUpgradeLevels.ContainsKey(data))
+        {
+            Debug.LogWarning($"Weapon {data.weaponName} is already owned.");
+            Hide();
+            Time.timeScale = 1f;
+            return;
+        }
+
         Debug.Log($"Selected: {data.weaponName}");
 
         PlayerController.weaponCount++;

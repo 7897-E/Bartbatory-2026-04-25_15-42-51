@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponName: Shotgun
   description: Shotgun
-  weapon: {fileID: 0}
+  weapon: {fileID: 235369070727013317, guid: 0014527b3e70fb640a6468c708efddb8, type: 3}
   fireRate: 0.5
   meleeDamage: 0
   projectileDamage: 5
