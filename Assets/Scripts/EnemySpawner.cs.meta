@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 25f855ec56abce642823a7cda97cda23
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - ZombPrefab: {fileID: 5766218416977274176, guid: 63df890f87342d44abf060f2c509cecf, type: 3}
+  - CheetahPrefab: {fileID: 5766218416977274176, guid: c235857aea694074c8845cec475e074e, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
