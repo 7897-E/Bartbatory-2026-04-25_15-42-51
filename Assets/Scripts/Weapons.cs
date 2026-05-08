@@ -34,7 +34,6 @@ public class Weapons : ScriptableObject
     public float ShotgunRange = 10f;
 
     [Header("Flamethrower (Shotgun Level Up)")]
-    // Flamethrower stats - partially dependent on shotgun stats
     [Tooltip("Flamethrower damage multiplier based on shotgun damage (e.g., 0.4 = 40% of shotgun damage)")]
     public float flamethrowerDamageMultiplier = 0.4f;
     [Tooltip("Flamethrower fire rate (independent of shotgun)")]
@@ -59,6 +58,34 @@ public class Weapons : ScriptableObject
     
     [Header("Upgrades")]
     public List<Upgrades> Compatibleupgrades = new List<Upgrades>();
+    
+    // Flamethrower-specific upgrades (shown when shotgun reaches levelup)
+    [Header("Flamethrower Upgrades")]
+    public List<Upgrades> FlamethrowerUpgrades = new List<Upgrades>();
+    
+    // Check if an upgrade is compatible with this weapon at the given level
+    public bool IsUpgradeCompatible(Upgrades upgrade, int currentLevel)
+    {
+        // For shotgun: if below levelup, use regular compatible upgrades
+        // If at or above levelup (flamethrower mode), use flamethrower upgrades
+        if (weaponType == WeaponType.Shotgun)
+        {
+            if (currentLevel >= levelup)
+            {
+                // In flamethrower mode - check flamethrower upgrades
+                return FlamethrowerUpgrades.Contains(upgrade);
+            }
+            else
+            {
+                // Regular shotgun mode - check regular upgrades
+                return Compatibleupgrades.Contains(upgrade);
+            }
+        }
+        
+        // For other weapons, just check regular compatible upgrades
+        return Compatibleupgrades.Contains(upgrade);
+    }
+    
     public GameObject Apply(PlayerController playerController, Transform weaponHolder, Camera playerCamera, int weaponIndex = 0)
     {
         if (weapon == null)
@@ -104,7 +131,6 @@ public class Weapons : ScriptableObject
         bat.weaponType = (BatScript.WeaponType)weaponType;
         bat.levelUpBulletPrefabObject = levelUpBulletPrefab;
         
-        // Flamethrower stats
         bat.flamethrowerDamageMultiplier = flamethrowerDamageMultiplier;
         bat.flamethrowerFireRate = flamethrowerFireRate;
         bat.flamethrowerSpeedMultiplier = flamethrowerSpeedMultiplier;

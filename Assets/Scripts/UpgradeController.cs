@@ -88,16 +88,31 @@ public class UpgradeUIController : MonoBehaviour
         
         foreach (var weapon in PlayerController.weaponUpgradeLevels.Keys)
         {
+            int currentLevel = PlayerController.weaponUpgradeLevels[weapon];
+            
             foreach (var upgrade in allUpgrades)
             {
-                if(weapon.Compatibleupgrades.Contains(upgrade))
-                upgradePool.Add((upgrade, weapon));
+                // Use the weapon's built-in compatibility check that handles shotgun/flamethrower logic
+                if (weapon.IsUpgradeCompatible(upgrade, currentLevel))
+                {
+                    upgradePool.Add((upgrade, weapon));
+                }
             }
         }
 
         foreach(var upgrade in defualtUpgrades)
         {
             upgradePool.Add((upgrade, null));
+        }
+
+        if (upgradePool.Count == 0)
+        {
+            Debug.LogWarning("No compatible upgrades found for current weapons.");
+            // Fallback: add all default upgrades
+            foreach(var upgrade in defualtUpgrades)
+            {
+                upgradePool.Add((upgrade, null));
+            }
         }
 
         int count = Mathf.Min(choicesPerLevel, upgradePool.Count);

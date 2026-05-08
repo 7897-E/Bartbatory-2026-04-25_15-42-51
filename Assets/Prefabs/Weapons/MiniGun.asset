@@ -21,12 +21,22 @@ MonoBehaviour:
   projectileDamage: 2
   meleeRange: 1
   weaponRadius: 0.5
+  levelup: 5
+  levelUpBulletPrefab: {fileID: 7348029680949209567, guid: f83bdde8ba53b04438405bbd9cf9dcc8, type: 3}
   bulletSpeed: 10
   MaxHits: 1
   bounces: 0
   shotgunPellets: 5
   shotgunSpread: 30
   ShotgunRange: 10
+  flamethrowerDamageMultiplier: 0.4
+  flamethrowerFireRate: 0.1
+  flamethrowerSpeedMultiplier: 0.8
+  flamethrowerSpread: 25
+  flamethrowerRange: 8
+  flamethrowerFireDuration: 3
+  flamethrowerFireDPS: 2
+  flamethrowerFlameCount: 8
   swingAngle: 90
   swingDuration: 0.15
   levelsUntilRanged: 5
@@ -36,3 +46,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4781fe90ad750f24183f320ca2d75b95, type: 2}
   - {fileID: 11400000, guid: e458d9d55a39b8e489d439e98d7b865f, type: 2}
   - {fileID: 11400000, guid: d651d5416bd95004a981d4a459e38810, type: 2}
+  FlamethrowerUpgrades: []
