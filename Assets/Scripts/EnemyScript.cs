@@ -35,6 +35,15 @@ public class EnemyScript : MonoBehaviour
     private Rigidbody2D rb;
     private float activeFollowSpeed;
 
+    [Header("Fire Effect")]
+    private bool isBurning = false;
+    private float fireTimer = 0f;
+    private float fireDurationTimer = 0f;
+    private int fireDamagePerSecond = 0;
+    private float flashTimer = 0f;
+    private float flashInterval = 0.15f;
+    private Color originalColor;
+
     [Header("Shooting (Boss Only)")]
     public bool canShoot = false;
     public BossBall projectilePrefab;
@@ -80,11 +89,19 @@ public class EnemyScript : MonoBehaviour
         }
 
         activeFollowSpeed = followSpeed;
+        
+        if (sr != null)
+        {
+            originalColor = sr.color;
+        }
     }
 
     private void LateUpdate()
     {
         if (target == null) return;
+
+        // Update fire effect
+        UpdateFireEffect();
 
         Vector3 previousPosition = rb != null ? (Vector3)rb.position : transform.position;
 
@@ -189,6 +206,72 @@ public class EnemyScript : MonoBehaviour
         if (currentHealth <= 0)
         {
             Die();
+        }
+    }
+
+    public void ApplyFireEffect(float duration, int damagePerSecond)
+    {
+        // If already burning, refresh the duration if new fire is stronger or longer
+        if (isBurning)
+        {
+            if (duration > fireDurationTimer || damagePerSecond > fireDamagePerSecond)
+            {
+                fireDurationTimer = duration;
+                fireDamagePerSecond = damagePerSecond;
+            }
+            return;
+        }
+
+        isBurning = true;
+        fireDurationTimer = duration;
+        fireDamagePerSecond = damagePerSecond;
+        fireTimer = 0f;
+    }
+
+    private void UpdateFireEffect()
+    {
+        if (isBurning)
+        {
+            fireTimer += Time.deltaTime;
+            fireDurationTimer -= Time.deltaTime;
+            flashTimer += Time.deltaTime;
+
+            // Flash red effect
+            if (flashTimer >= flashInterval)
+            {
+                flashTimer = 0f;
+                if (sr != null)
+                {
+                    // Toggle between red and original color
+                    if (sr.color == Color.red)
+                    {
+                        sr.color = originalColor;
+                    }
+                    else
+                    {
+                        sr.color = Color.red;
+                    }
+                }
+            }
+
+            // Deal damage every second
+            if (fireTimer >= 1f)
+            {
+                TakeDamage(fireDamagePerSecond);
+                fireTimer -= 1f;
+            }
+
+            // Extinguish when duration ends
+            if (fireDurationTimer <= 0f)
+            {
+                isBurning = false;
+                fireTimer = 0f;
+                flashTimer = 0f;
+                if (sr != null)
+                {
+                    sr.color = originalColor;
+                }
+            }
         }
     }
 

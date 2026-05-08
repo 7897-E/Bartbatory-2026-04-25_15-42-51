@@ -19,8 +19,11 @@ public class Weapons : ScriptableObject
     public int projectileDamage = 1;
     public float meleeRange = 1f;
     public float weaponRadius = 1f;
+    public int levelup = 5;
+
 
     [Header("Bullet")]
+    public Baseball levelUpBulletPrefab;
     public float bulletSpeed = 10f;
     public int MaxHits = 1;
     public int bounces = 0;
@@ -29,6 +32,25 @@ public class Weapons : ScriptableObject
     public int shotgunPellets = 5;
     public float shotgunSpread = 30f;
     public float ShotgunRange = 10f;
+
+    [Header("Flamethrower (Shotgun Level Up)")]
+    // Flamethrower stats - partially dependent on shotgun stats
+    [Tooltip("Flamethrower damage multiplier based on shotgun damage (e.g., 0.4 = 40% of shotgun damage)")]
+    public float flamethrowerDamageMultiplier = 0.4f;
+    [Tooltip("Flamethrower fire rate (independent of shotgun)")]
+    public float flamethrowerFireRate = 0.1f;
+    [Tooltip("Flamethrower projectile speed multiplier based on shotgun speed")]
+    public float flamethrowerSpeedMultiplier = 0.8f;
+    [Tooltip("Flamethrower spread angle (independent of shotgun)")]
+    public float flamethrowerSpread = 25f;
+    [Tooltip("Flamethrower range (independent of shotgun)")]
+    public float flamethrowerRange = 8f;
+    [Tooltip("Flamethrower fire duration on enemies")]
+    public float flamethrowerFireDuration = 3f;
+    [Tooltip("Flamethrower damage per second")]
+    public int flamethrowerFireDPS = 2;
+    [Tooltip("Number of flames per shot for flamethrower")]
+    public int flamethrowerFlameCount = 8;
 
     [Header("Swing (Bat only)")]
     public float swingAngle = 90f;
@@ -76,9 +98,21 @@ public class Weapons : ScriptableObject
         bat.shotgunSpread = shotgunSpread;
         bat.ShotgunRange = ShotgunRange;
         bat.levelsUntilRanged = levelsUntilRanged;
+        bat.levelup = levelup;
         bat.swingAngle = swingAngle;
         bat.swingDuration = swingDuration;
         bat.weaponType = (BatScript.WeaponType)weaponType;
+        bat.levelUpBulletPrefabObject = levelUpBulletPrefab;
+        
+        // Flamethrower stats
+        bat.flamethrowerDamageMultiplier = flamethrowerDamageMultiplier;
+        bat.flamethrowerFireRate = flamethrowerFireRate;
+        bat.flamethrowerSpeedMultiplier = flamethrowerSpeedMultiplier;
+        bat.flamethrowerSpread = flamethrowerSpread;
+        bat.flamethrowerRange = flamethrowerRange;
+        bat.flamethrowerFireDuration = flamethrowerFireDuration;
+        bat.flamethrowerFireDPS = flamethrowerFireDPS;
+        bat.flamethrowerFlameCount = flamethrowerFlameCount;
 
         if (playerCamera != null)
         {

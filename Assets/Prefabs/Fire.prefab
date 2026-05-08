@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6571152118930678684}
   - component: {fileID: 7348029680949209567}
   m_Layer: 0
-  m_Name: ShotgunPellet
+  m_Name: Fire
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.09105, y: 0.21675, z: 0}
-  m_LocalScale: {x: 0.75, y: 0.75, z: 0.4192}
+  m_LocalScale: {x: 0.4192, y: 0.4192, z: 0.4192}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -76,7 +76,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 8
-  m_Sprite: {fileID: 21300000, guid: 8c7d4e06be54f154d87c2e18f82c8342, type: 3}
+  m_Sprite: {fileID: 21300000, guid: d0f4ee0bc37675a4d94e80163d028799, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -165,3 +165,6 @@ MonoBehaviour:
   spriteRenderer: {fileID: 0}
   normalSprite: {fileID: 0}
   levelUpSprite: {fileID: 0}
+  appliesFire: 1
+  fireDuration: 3
+  fireDamagePerSecond: 4

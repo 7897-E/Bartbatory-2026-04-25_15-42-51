@@ -74,6 +74,39 @@ public class Upgrades : ScriptableObject
                     batInstance.shotgunPellets = (int)ApplyValue(batInstance.shotgunPellets, change, level);
                     batInstance.currentLevel = level;
                     break;
+                // Flamethrower-specific upgrades
+                case UpgradeAttribute.FlamethrowerDamage:
+                    batInstance.flamethrowerDamageMultiplier = ApplyValue(batInstance.flamethrowerDamageMultiplier, change, level);
+                    batInstance.currentLevel = level;
+                    break;
+                case UpgradeAttribute.FlamethrowerFireRate:
+                    batInstance.flamethrowerFireRate = Mathf.Max(0.05f, batInstance.flamethrowerFireRate - ApplyValue(0.01f, change, level));
+                    batInstance.currentLevel = level;
+                    break;
+                case UpgradeAttribute.FlamethrowerSpeed:
+                    batInstance.flamethrowerSpeedMultiplier = ApplyValue(batInstance.flamethrowerSpeedMultiplier, change, level);
+                    batInstance.currentLevel = level;
+                    break;
+                case UpgradeAttribute.FlamethrowerSpread:
+                    batInstance.flamethrowerSpread = ApplyValue(batInstance.flamethrowerSpread, change, level);
+                    batInstance.currentLevel = level;
+                    break;
+                case UpgradeAttribute.FlamethrowerRange:
+                    // Flamethrower range is not directly used in BatScript but can be stored
+                    batInstance.currentLevel = level;
+                    break;
+                case UpgradeAttribute.FlamethrowerFireDuration:
+                    batInstance.flamethrowerFireDuration = ApplyValue(batInstance.flamethrowerFireDuration, change, level);
+                    batInstance.currentLevel = level;
+                    break;
+                case UpgradeAttribute.FlamethrowerFireDPS:
+                    batInstance.flamethrowerFireDPS = (int)ApplyValue(batInstance.flamethrowerFireDPS, change, level);
+                    batInstance.currentLevel = level;
+                    break;
+                case UpgradeAttribute.FlamethrowerFlameCount:
+                    batInstance.flamethrowerFlameCount = (int)ApplyValue(batInstance.flamethrowerFlameCount, change, level);
+                    batInstance.currentLevel = level;
+                    break;
             }
         }
     }
@@ -110,7 +143,15 @@ public enum UpgradeAttribute
     Bounces,
     Range,
     Spread,
-    PelletCount
+    PelletCount,
+    FlamethrowerDamage,
+    FlamethrowerFireRate,
+    FlamethrowerSpeed,
+    FlamethrowerSpread,
+    FlamethrowerRange,
+    FlamethrowerFireDuration,
+    FlamethrowerFireDPS,
+    FlamethrowerFlameCount
 
 }
 

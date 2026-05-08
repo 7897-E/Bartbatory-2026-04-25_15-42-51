@@ -21,8 +21,6 @@ public class CameraFollow : MonoBehaviour
     {
         maxX = (xscale * map.Width);
         maxY = (yscale * map.Height);
-        Debug.Log(maxX);
-        Debug.Log(maxY);
         if (target == null) return;
 
         Vector3 desiredPosition = target.position + offset;

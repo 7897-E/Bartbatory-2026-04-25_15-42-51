@@ -162,3 +162,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canHitPlayer: 0
+  spriteRenderer: {fileID: 0}
+  normalSprite: {fileID: 0}
+  levelUpSprite: {fileID: 0}

@@ -12,6 +12,7 @@ public class BatScript : MonoBehaviour
     public float rotationSpeed = 720f;
     [Header("Bullet")]
     public Baseball bulletPrefab;
+    public Baseball levelUpBulletPrefabObject;
     public Camera cam;
     public int currentLevel = 0;
     public float meleeOffsetDistance = 1.5f;   
@@ -20,7 +21,7 @@ public class BatScript : MonoBehaviour
     public float batMoveSpeed = 10f;  
     [Header("Weapon Type Inherited")]
     public WeaponType weaponType = WeaponType.Bat;
-
+    public int levelup = 5;
     [Header("Firing inherited")]
     public float fireRate = 0.3f;
     private float fireCooldown = 0f;
@@ -36,6 +37,16 @@ public class BatScript : MonoBehaviour
     public int shotgunPellets = 5;
     public float shotgunSpread = 30f;
     public float ShotgunRange = 10f;
+
+    [Header("Flamethrower Inherited")]
+    public float flamethrowerDamageMultiplier = 0.4f;
+    public float flamethrowerFireRate = 0.1f;
+    public float flamethrowerSpeedMultiplier = 0.8f;
+    public float flamethrowerSpread = 25f;
+    public float flamethrowerRange = 8f;
+    public float flamethrowerFireDuration = 3f;
+    public int flamethrowerFireDPS = 2;
+    public int flamethrowerFlameCount = 8;
 
     [Header("Swing (Bat only) inherited")]
     public float swingAngle = 90f;
@@ -150,8 +161,9 @@ public class BatScript : MonoBehaviour
             return;
         }
 
-        fireCooldown = fireRate;
-
+        // Determine fire rate based on weapon type and level
+        float currentFireRate = fireRate;
+        
         switch (weaponType)
         {
             case WeaponType.Bat:
@@ -170,15 +182,22 @@ public class BatScript : MonoBehaviour
                 FireBullet(targetPos);
                 break;
             case WeaponType.Shotgun:
-                FireShotgun(targetPos);
+                if(currentLevel >= levelup){
+                    // Use flamethrower fire rate when in flamethrower mode
+                    currentFireRate = flamethrowerFireRate;
+                    FireFlames(targetPos);
+                }else{
+                    FireShotgun(targetPos);
+                }
                 break;
         }
+        
+        fireCooldown = currentFireRate;
     }
 
     private void FireBullet(Vector3 targetPos)
     {
         Transform spawnTransform = firePoint != null ? firePoint : batPivot;
-
         Vector3 dir = (targetPos - spawnTransform.position).normalized;
         Quaternion rot = Quaternion.LookRotation(Vector3.forward, dir);
 
@@ -210,6 +229,43 @@ public class BatScript : MonoBehaviour
             );
 
             bullet.Init(dir, projectileDamage, bulletSpeed, MaxHits, bounces, cam, true, ShotgunRange);
+        }
+    }
+    private void FireFlames(Vector3 targetPos)
+    {
+        Transform spawnTransform = firePoint != null ? firePoint : batPivot;
+        Vector3 baseDir = (targetPos - spawnTransform.position).normalized;
+        Baseball prefabToUse = levelUpBulletPrefabObject != null ? levelUpBulletPrefabObject : bulletPrefab;
+
+        if (prefabToUse == null)
+        {
+            Debug.LogWarning($"No bullet prefab assigned for weapon type {weaponType}");
+            return;
+        }
+
+        // Calculate flamethrower damage based on projectile damage with multiplier
+        int flamethrowerDamage = Mathf.Max(1, Mathf.RoundToInt(projectileDamage * flamethrowerDamageMultiplier));
+        float flamethrowerSpeed = bulletSpeed * flamethrowerSpeedMultiplier;
+
+        // Fire multiple flames with spread
+        for (int i = 0; i < flamethrowerFlameCount; i++)
+        {
+            float angleOffset = Random.Range(-flamethrowerSpread / 2f, flamethrowerSpread / 2f) * Mathf.Deg2Rad;
+            Vector3 dir = Quaternion.Euler(0, 0, angleOffset * Mathf.Rad2Deg) * baseDir;
+
+            Baseball bullet = Instantiate(
+                prefabToUse,
+                spawnTransform.position,
+                Quaternion.LookRotation(Vector3.forward, dir)
+            ).GetComponent<Baseball>();
+
+            if (bullet == null)
+            {
+                Debug.LogError($"Prefab {prefabToUse.name} does not have a Baseball component");
+                continue;
+            }
+
+            bullet.Init(dir, flamethrowerDamage, flamethrowerSpeed, MaxHits, bounces, cam, false, 0, true, true, flamethrowerFireDuration, flamethrowerFireDPS);
         }
     }
 

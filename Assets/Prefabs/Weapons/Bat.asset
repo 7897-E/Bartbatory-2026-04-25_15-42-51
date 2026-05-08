@@ -21,6 +21,8 @@ MonoBehaviour:
   projectileDamage: 5
   meleeRange: 1
   weaponRadius: 0.5
+  bulletPrefab: {fileID: 9032325113177028132, guid: f83bdde8ba53b04438405bbd9cf9dcc8, type: 3}
+  levelUpBulletPrefab: {fileID: 0}
   bulletSpeed: 10
   MaxHits: 1
   bounces: 0
