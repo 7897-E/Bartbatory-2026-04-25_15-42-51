@@ -59,30 +59,26 @@ public class Weapons : ScriptableObject
     [Header("Upgrades")]
     public List<Upgrades> Compatibleupgrades = new List<Upgrades>();
     
-    // Flamethrower-specific upgrades (shown when shotgun reaches levelup)
     [Header("Flamethrower Upgrades")]
     public List<Upgrades> FlamethrowerUpgrades = new List<Upgrades>();
     
-    // Check if an upgrade is compatible with this weapon at the given level
     public bool IsUpgradeCompatible(Upgrades upgrade, int currentLevel)
     {
-        // For shotgun: if below levelup, use regular compatible upgrades
-        // If at or above levelup (flamethrower mode), use flamethrower upgrades
+
         if (weaponType == WeaponType.Shotgun)
         {
             if (currentLevel >= levelup)
             {
-                // In flamethrower mode - check flamethrower upgrades
-                return FlamethrowerUpgrades.Contains(upgrade);
+                List<Upgrades> combinedUpgrades = new List<Upgrades>(Compatibleupgrades);
+                combinedUpgrades.AddRange(FlamethrowerUpgrades);
+                return combinedUpgrades.Contains(upgrade);
             }
             else
             {
-                // Regular shotgun mode - check regular upgrades
                 return Compatibleupgrades.Contains(upgrade);
             }
         }
         
-        // For other weapons, just check regular compatible upgrades
         return Compatibleupgrades.Contains(upgrade);
     }
     

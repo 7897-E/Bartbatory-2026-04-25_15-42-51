@@ -34,8 +34,8 @@ MonoBehaviour:
   flamethrowerSpeedMultiplier: 0.8
   flamethrowerSpread: 0
   flamethrowerRange: 0.25
-  flamethrowerFireDuration: 2
-  flamethrowerFireDPS: 2
+  flamethrowerFireDuration: 4
+  flamethrowerFireDPS: 1
   flamethrowerFlameCount: 1
   swingAngle: 90
   swingDuration: 0.6

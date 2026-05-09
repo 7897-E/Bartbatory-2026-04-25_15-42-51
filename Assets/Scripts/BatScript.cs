@@ -47,6 +47,7 @@ public class BatScript : MonoBehaviour
     public float flamethrowerFireDuration = 3f;
     public int flamethrowerFireDPS = 2;
     public int flamethrowerFlameCount = 8;
+    private float flamethrowerCooldown = 0f;
 
     [Header("Swing (Bat only) inherited")]
     public float swingAngle = 90f;
@@ -97,9 +98,11 @@ public class BatScript : MonoBehaviour
         {
             if(currentLevel < levelsUntilRanged)
                 UpdateSide(nearestEnemy.transform.position);
-            AimAt(nearestEnemy.transform.position);
-            FireAt(nearestEnemy.transform.position);
+                AimAt(nearestEnemy.transform.position);
+                FireAt(nearestEnemy.transform.position);
+
         }
+        
         else
         {
             if (weaponTargets.ContainsKey(this))
@@ -108,11 +111,34 @@ public class BatScript : MonoBehaviour
             }
             currentTarget = null;
         }
-
+        if(currentLevel >= levelup){
+        nearestEnemy = FindNearestEnemy();
+        
+        if (nearestEnemy != currentTarget)
+        {
+            if (currentTarget != null && weaponTargets.ContainsKey(this) && weaponTargets[this] == currentTarget)
+            {
+                weaponTargets.Remove(this);
+            }
+            currentTarget = nearestEnemy;
+            if (currentTarget != null)
+            {
+                weaponTargets[this] = currentTarget;
+            }
+        }
+        if (nearestEnemy != null){
+        if(currentLevel < levelsUntilRanged)
+                UpdateSide(nearestEnemy.transform.position);
+                AimAt(nearestEnemy.transform.position);
+                FireUp(nearestEnemy.transform.position);
+        }
+        }
         if (weaponType == WeaponType.Bat)
         {
             UpdateSwing();
         }
+
+        
     }
 
     private void AimAt(Vector3 targetPos)
@@ -154,16 +180,13 @@ public class BatScript : MonoBehaviour
     }
 
     private void FireAt(Vector3 targetPos)
+
     {
         if (fireCooldown > 0f)
         {
-            fireCooldown -= Time.deltaTime;
-            return;
-        }
-
-        // Determine fire rate based on weapon type and level
-        float currentFireRate = fireRate;
-        
+            fireCooldown -= Time.deltaTime;       
+            return; 
+        }        
         switch (weaponType)
         {
             case WeaponType.Bat:
@@ -183,18 +206,33 @@ public class BatScript : MonoBehaviour
                 break;
             case WeaponType.Shotgun:
                 if(currentLevel >= levelup){
-                    // Use flamethrower fire rate when in flamethrower mode
-                    currentFireRate = flamethrowerFireRate;
-                    FireFlames(targetPos);
+                    FireShotgun(targetPos);
                 }else{
                     FireShotgun(targetPos);
                 }
                 break;
         }
         
-        fireCooldown = currentFireRate;
+        fireCooldown = fireRate;
     }
 
+    private void FireUp(Vector3 targetPos)
+    {
+        if (flamethrowerCooldown > 0f) {flamethrowerCooldown-= Time.deltaTime;return;}
+
+        switch (weaponType)
+        {
+            case WeaponType.Bat:
+                break;
+            case WeaponType.Minigun:
+                break;
+            case WeaponType.Shotgun:
+                FireFlames(targetPos);
+                break;
+        }
+
+        flamethrowerCooldown = flamethrowerFireRate;
+    }
     private void FireBullet(Vector3 targetPos)
     {
         Transform spawnTransform = firePoint != null ? firePoint : batPivot;
@@ -243,11 +281,9 @@ public class BatScript : MonoBehaviour
             return;
         }
 
-        // Calculate flamethrower damage based on projectile damage with multiplier
         int flamethrowerDamage = Mathf.Max(1, Mathf.RoundToInt(projectileDamage * flamethrowerDamageMultiplier));
         float flamethrowerSpeed = bulletSpeed * flamethrowerSpeedMultiplier;
 
-        // Fire multiple flames with spread
         for (int i = 0; i < flamethrowerFlameCount; i++)
         {
             float angleOffset = Random.Range(-flamethrowerSpread / 2f, flamethrowerSpread / 2f) * Mathf.Deg2Rad;
@@ -265,7 +301,7 @@ public class BatScript : MonoBehaviour
                 continue;
             }
 
-            bullet.Init(dir, flamethrowerDamage, flamethrowerSpeed, MaxHits, bounces, cam, false, 0, true, true, flamethrowerFireDuration, flamethrowerFireDPS);
+            bullet.Init(dir, flamethrowerDamage, flamethrowerSpeed, MaxHits, bounces, cam, true, flamethrowerRange, true, true, flamethrowerFireDuration, flamethrowerFireDPS);
         }
     }
 
