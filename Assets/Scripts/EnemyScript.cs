@@ -40,9 +40,15 @@ public class EnemyScript : MonoBehaviour
     private float fireTimer = 0f;
     private float fireDurationTimer = 0f;
     private int fireDamagePerSecond = 0;
-    private float flashTimer = 0f;
-    private float flashInterval = 0.15f;
+    private float fireFlashTimer = 0f;
+    private float fireFlashInterval = 0.15f;
     private Color originalColor;
+
+    [Header("Damage Flash Effect")]
+    private float damageFlashTimer = 0f;
+    private float damageFlashDuration = 0.2f;
+    private float damageFlashInterval = 0.1f;
+    private bool isDamageFlashing = false;
 
     [Header("Shooting (Boss Only)")]
     public bool canShoot = false;
@@ -100,8 +106,8 @@ public class EnemyScript : MonoBehaviour
     {
         if (target == null) return;
 
-        // Update fire effect
         UpdateFireEffect();
+        UpdateDamageFlash();
 
         Vector3 previousPosition = rb != null ? (Vector3)rb.position : transform.position;
 
@@ -203,15 +209,28 @@ public class EnemyScript : MonoBehaviour
     public void TakeDamage(int damageTaken)
     {
         currentHealth -= damageTaken;
+        if (!isBurning)
+        {
+            StartDamageFlash();
+        }
         if (currentHealth <= 0)
         {
             Die();
         }
     }
 
+    private void StartDamageFlash()
+    {
+        isDamageFlashing = true;
+        damageFlashTimer = damageFlashDuration;
+        if (sr != null)
+        {
+            sr.color = Color.red;
+        }
+    }
+
     public void ApplyFireEffect(float duration, int damagePerSecond)
     {
-        // If already burning, refresh the duration if new fire is stronger or longer
         if (isBurning)
         {
             if (duration > fireDurationTimer || damagePerSecond > fireDamagePerSecond)
@@ -234,15 +253,13 @@ public class EnemyScript : MonoBehaviour
         {
             fireTimer += Time.deltaTime;
             fireDurationTimer -= Time.deltaTime;
-            flashTimer += Time.deltaTime;
+            fireFlashTimer += Time.deltaTime;
 
-            // Flash red effect
-            if (flashTimer >= flashInterval)
+            if (fireFlashTimer >= fireFlashInterval)
             {
-                flashTimer = 0f;
+                fireFlashTimer = 0f;
                 if (sr != null)
                 {
-                    // Toggle between red and original color
                     if (sr.color == Color.red)
                     {
                         sr.color = originalColor;
@@ -254,20 +271,39 @@ public class EnemyScript : MonoBehaviour
                 }
             }
 
-            // Deal damage every second
             if (fireTimer >= 1f)
             {
                 TakeDamage(fireDamagePerSecond);
                 fireTimer -= 1f;
+                if (sr != null)
+                {
+                    sr.color = Color.red;
+                }
             }
 
-            // Extinguish when duration ends
             if (fireDurationTimer <= 0f)
             {
                 isBurning = false;
                 fireTimer = 0f;
-                flashTimer = 0f;
+                fireFlashTimer = 0f;
                 if (sr != null)
+                {
+                    sr.color = originalColor;
+                }
+            }
+        }
+    }
+
+    private void UpdateDamageFlash()
+    {
+        if (isDamageFlashing)
+        {
+            damageFlashTimer -= Time.deltaTime;
+            
+            if (damageFlashTimer <= 0f)
+            {
+                isDamageFlashing = false;
+                if (!isBurning && sr != null)
                 {
                     sr.color = originalColor;
                 }
@@ -277,6 +313,10 @@ public class EnemyScript : MonoBehaviour
 
     private void Die()
 {   
+    if (sr != null)
+        {
+            sr.color = Color.red;
+        }
     if (XPOrbPrefab != null)
     {
         XPOrb xpOrb = Instantiate(XPOrbPrefab, transform.position, Quaternion.identity);

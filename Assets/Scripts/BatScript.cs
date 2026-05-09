@@ -126,12 +126,12 @@ public class BatScript : MonoBehaviour
                 weaponTargets[this] = currentTarget;
             }
         }
-        if (nearestEnemy != null){
-        if(currentLevel < levelsUntilRanged)
-                UpdateSide(nearestEnemy.transform.position);
-                AimAt(nearestEnemy.transform.position);
-                FireUp(nearestEnemy.transform.position);
-        }
+            if (nearestEnemy != null){
+                if(currentLevel < levelsUntilRanged)
+                    UpdateSide(nearestEnemy.transform.position);
+                    AimAt(nearestEnemy.transform.position);
+                    FireUp(nearestEnemy.transform.position);
+            }
         }
         if (weaponType == WeaponType.Bat)
         {
