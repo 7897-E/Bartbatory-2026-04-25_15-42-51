@@ -1636,6 +1636,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 2db6dab743f5ad04cab734a28664f3a2, type: 2}
   - {fileID: 11400000, guid: 49f73486b99f9624092981d34864dac1, type: 2}
   - {fileID: 11400000, guid: 28a171cfe678f854e8533db576e2cb94, type: 2}
+  - {fileID: 11400000, guid: 52fb7ee2999a3c44e9f47b12cce43153, type: 2}
+  - {fileID: 11400000, guid: 4781fe90ad750f24183f320ca2d75b95, type: 2}
+  - {fileID: 11400000, guid: b5150d351cd0bf143bc28f5a57402fe2, type: 2}
+  - {fileID: 11400000, guid: 302aacebcddeed343b359507cbccc262, type: 2}
+  - {fileID: 11400000, guid: dba312b012adcbd43a43d561a399d299, type: 2}
+  - {fileID: 11400000, guid: ec6216d7d35515e46beeb54ae5c648f4, type: 2}
   defualtUpgrades:
   - {fileID: 11400000, guid: 63af240f5662e424aa012b2f46ad0c4f, type: 2}
   - {fileID: 11400000, guid: 693ba583f7e912e4891f73d7fc9a5c0a, type: 2}
@@ -1720,7 +1726,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 02a9ab6fe3b1b6541bec395e02026b42, type: 2}
   - {fileID: 11400000, guid: 69d276faf074cfa4db6b2d7696a1bb06, type: 2}
   WallTiles:
-  - {fileID: 11400000, guid: 69d276faf074cfa4db6b2d7696a1bb06, type: 2}
+  - {fileID: 11400000, guid: 4458036fa08b8194397f892eae0398d0, type: 2}
   ObstacleTiles:
   - {fileID: 11400000, guid: 3c38d9a157b70b04e84ce8597a8e025a, type: 2}
   GroundTileWeights:

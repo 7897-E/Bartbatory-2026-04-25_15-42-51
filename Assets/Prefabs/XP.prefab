@@ -162,7 +162,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minSpeed: 0
-  maxSpeed: 10
+  maxSpeed: 20
   maxDistance: 5
   XPValue: 10
   target: {fileID: 0}

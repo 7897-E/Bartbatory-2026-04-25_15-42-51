@@ -29,7 +29,7 @@ MonoBehaviour:
   shotgunPellets: 3
   shotgunSpread: 30
   ShotgunRange: 0.5
-  flamethrowerDamageMultiplier: 0.3
+  flamethrowerDamageMultiplier: 0.1
   flamethrowerFireRate: 0.2
   flamethrowerSpeedMultiplier: 0.8
   flamethrowerSpread: 0
@@ -53,3 +53,6 @@ MonoBehaviour:
   FlamethrowerUpgrades:
   - {fileID: 11400000, guid: 302aacebcddeed343b359507cbccc262, type: 2}
   - {fileID: 11400000, guid: 52fb7ee2999a3c44e9f47b12cce43153, type: 2}
+  - {fileID: 11400000, guid: 4781fe90ad750f24183f320ca2d75b95, type: 2}
+  - {fileID: 11400000, guid: b5150d351cd0bf143bc28f5a57402fe2, type: 2}
+  - {fileID: 11400000, guid: dba312b012adcbd43a43d561a399d299, type: 2}
