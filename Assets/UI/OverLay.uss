@@ -33,6 +33,7 @@
 #DashCooldown .unity-progress-bar__title {
     display: none;
 }
+
 #HealthBar .unity-progress-bar__background {
     background-color: rgb(58, 31, 31);
     border-radius: 9px;
@@ -66,6 +67,7 @@
 #PauseMenu {
     display: none;
 }
+
 #EndScreen {
     display: none;
 }
