@@ -6,6 +6,7 @@ public class XPOrb : MonoBehaviour
     public float minSpeed = 2f;
     public float maxSpeed = 10f;
     public float maxDistance = 20f;
+    [Header("XP Settings Inherited by Spawner")]
     public int XPValue = 10;
     public Transform target;
 
