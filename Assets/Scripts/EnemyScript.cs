@@ -47,7 +47,6 @@ public class EnemyScript : MonoBehaviour
     [Header("Damage Flash Effect")]
     private float damageFlashTimer = 0f;
     private float damageFlashDuration = 0.2f;
-    private float damageFlashInterval = 0.1f;
     private bool isDamageFlashing = false;
 
     [Header("Shooting (Boss Only)")]

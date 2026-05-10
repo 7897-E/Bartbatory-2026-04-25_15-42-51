@@ -147,7 +147,7 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_Size: {x: 8, y: 8}
+  m_Size: {x: 5, y: 5}
   m_Direction: 0
 --- !u!114 &863922030226166341
 MonoBehaviour:
@@ -166,3 +166,6 @@ MonoBehaviour:
   maxDistance: 5
   XPValue: 10
   target: {fileID: 0}
+  orbAttractionDistance: 5
+  minOrbsForAttraction: 25
+  baseColor: {r: 0.03137255, g: 0.61960787, b: 0.03137255, a: 1}
