@@ -23,7 +23,19 @@ public class EnemySpawner : MonoBehaviour
     public int Bulkdamage;
     public float BulkCooldown;
      public int BulkXp= 20;
-     [Header("Boss1 Settings")]
+    [Header("BabyBert Settings")]
+    public EnemyScript BabyBertPrefab;
+    public int BabyBertHealth = 10;
+    public float BabyBertfollowSpeed = 1.5f;
+    public int BabyBertdamage;
+    public float BabyBertCooldown;
+    public int BabyBertXp = 20;
+    [Header("BabyBert Projectile")]
+    public BossBall BabyBertProjectile;
+    public float BabyBertProjectileSpeed;
+    public int BabyBertProjectileDamage;
+    public float BabyBertProjectileCooldown;
+    [Header("Boss1 Settings")]
     public EnemyScript Boss1Prefab;
     public int Boss1Health = 40;
     public float Boss1FallowSpeed = 4f;
@@ -53,6 +65,12 @@ public class EnemySpawner : MonoBehaviour
     {
         EnemyScript enemyInstance = Instantiate(BulkPrefab, position, Quaternion.identity);
         enemyInstance.Init(map, target, BulkHealth, playerCharacter, BulKFallowSpeed, Bulkdamage, BulkCooldown, BulkXp, false,0f, projectile, cam, projectileSpeed, 0, level);
+        return enemyInstance;
+    }
+    public EnemyScript SpawnBabyBert(MapGeneration map, Transform target, Vector3 position, PlayerController playerCharacter, int level)
+    {
+        EnemyScript enemyInstance = Instantiate(BabyBertPrefab, position, Quaternion.identity);
+        enemyInstance.Init(map, target, BabyBertHealth, playerCharacter, BabyBertfollowSpeed, BabyBertdamage, BabyBertCooldown, BabyBertXp, true,BabyBertProjectileCooldown, projectile, cam, projectileSpeed, 0, level);
         return enemyInstance;
     }
     public EnemyScript SpawnBoss1(MapGeneration map, Transform target, Vector3 position, PlayerController playerCharacter, int level)

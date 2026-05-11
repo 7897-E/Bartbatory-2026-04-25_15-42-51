@@ -116,9 +116,9 @@ public void OnBossDefeated()
                 }
                 spawnInterval = postBossSpawnInterval;                
             }
-        if (spawnInterval <= 0.3f)
+if (spawnInterval <= 0.3f)
 {
-    int randomEnemy = Random.Range(0, 3);
+    int randomEnemy = Random.Range(0, 4);
 
     if (randomEnemy == 0)
     {
@@ -128,9 +128,13 @@ public void OnBossDefeated()
     {
         enemySpawner.SpawnCheetah(BoardManager, PlayerController.transform, spawnPos, PlayerController, level);
     }
-    else
+    else if (randomEnemy == 2)
     {
         enemySpawner.SpawnBulk(BoardManager, PlayerController.transform, spawnPos, PlayerController, level);
+    }
+    else
+    {
+        enemySpawner.SpawnBabyBert(BoardManager, PlayerController.transform, spawnPos, PlayerController, level);
     }
 
 }
