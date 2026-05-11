@@ -502,6 +502,16 @@ MonoBehaviour:
   Bulkdamage: 5
   BulkCooldown: 3
   BulkXp: 20
+  BabyBertPrefab: {fileID: 5766218416977274176, guid: 719ea801f3d72b743b4b3988125d4a3e, type: 3}
+  BabyBertHealth: 10
+  BabyBertfollowSpeed: 1.5
+  BabyBertdamage: 0
+  BabyBertCooldown: 0
+  BabyBertXp: 20
+  BabyBertProjectile: {fileID: -2074199717930713086, guid: 33ebef0efef2f4547bb02369f823e4db, type: 3}
+  BabyBertProjectileSpeed: 5
+  BabyBertProjectileDamage: 8
+  BabyBertProjectileCooldown: 3
   Boss1Prefab: {fileID: 7336514868459462141, guid: e37972b77b33af847816bd0b8d693a0c, type: 3}
   Boss1Health: 40
   Boss1FallowSpeed: 4
