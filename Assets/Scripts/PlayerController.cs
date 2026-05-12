@@ -15,7 +15,6 @@ public class PlayerController : MonoBehaviour
 
     private Vector3 m_TargetWorldPos;
 
-
     [Header("Player Stats")]
     public int maxHealth = 10;
     public int currentHealth;
@@ -31,12 +30,18 @@ public class PlayerController : MonoBehaviour
     private Vector3 m_DashDirection = Vector3.zero;
     private float dashRecoverSpeed = 10f;
 
+    [Header("Dash I-Frames")]
+    public float flashInterval = 0.06f;
+    private bool isInvincible = false;
+    private Collider2D playerCollider;
+    private Coroutine dashFlashCoroutine;
+
     [Header("XP")]
     public int currentXP = 0;
     public int maxXP = 100;
-    public int levelsForWeapon = 5; 
+    public int levelsForWeapon = 5;
 
-    public Weapons startingWeapon; 
+    public Weapons startingWeapon;
 
     private int totalLevels = 0;
     public int TotalLevels => totalLevels;
@@ -44,7 +49,7 @@ public class PlayerController : MonoBehaviour
     public Dictionary<Weapons, int> weaponUpgradeLevels = new();
     public Dictionary<Weapons, BatScript> weaponInstances = new();
     public int weaponCount = 0;
-    
+
     [Header("UI")]
     public GameObject uiDocumentObject;
     public float barAnimationSpeed = 8f;
@@ -94,6 +99,7 @@ public class PlayerController : MonoBehaviour
         totalLevels = 0;
         weaponUpgradeLevels.Clear();
         weaponInstances.Clear();
+
         if (startingWeapon != null && weaponCount == 0)
         {
             currentWeapon = startingWeapon;
@@ -106,6 +112,7 @@ public class PlayerController : MonoBehaviour
                 weaponInstances[startingWeapon] = bat;
             }
         }
+
         activeMoveSpeed = moveSpeed;
         dashSpeed = moveSpeed * 2.5f;
         _trailRenderer = GetComponent<TrailRenderer>();
@@ -115,8 +122,11 @@ public class PlayerController : MonoBehaviour
         {
             rb = gameObject.AddComponent<Rigidbody2D>();
         }
+
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         rb.gravityScale = 0f;
+
+        playerCollider = GetComponent<Collider2D>();
 
         SetupUI();
     }
@@ -129,15 +139,8 @@ public class PlayerController : MonoBehaviour
         if (snapInstantly)
         {
             transform.position = m_TargetWorldPos;
-            
-        }
-        else
-        {
-            
         }
     }
-
-
 
     private void Update()
     {
@@ -146,20 +149,26 @@ public class PlayerController : MonoBehaviour
         moveInput = Vector2.zero;
 
         if (Keyboard.current.upArrowKey.isPressed || Keyboard.current.wKey.isPressed)
-            moveInput.y += 1f;  
+            moveInput.y += 1f;
+
         if (Keyboard.current.downArrowKey.isPressed || Keyboard.current.sKey.isPressed)
-            moveInput.y -= 1f;  
+            moveInput.y -= 1f;
+
         if (Keyboard.current.rightArrowKey.isPressed || Keyboard.current.dKey.isPressed)
-            moveInput.x += 1f;  
+            moveInput.x += 1f;
 
         if (Keyboard.current.leftArrowKey.isPressed || Keyboard.current.aKey.isPressed)
-            moveInput.x -= 1f;  
-        if (moveInput.sqrMagnitude > 0f){
-            sr.sprite = moveInput.x > 0f ? rightSprite : moveInput.x < 0f ? leftSprite : moveInput.y > 0f ? upSprite : downSprite;  
+            moveInput.x -= 1f;
+
+        if (moveInput.sqrMagnitude > 0f)
+        {
+            sr.sprite = moveInput.x > 0f ? rightSprite : moveInput.x < 0f ? leftSprite : moveInput.y > 0f ? upSprite : downSprite;
             Vector3 scaleVector = new Vector3(scale, scale, 1f);
             sr.transform.localScale = scaleVector;
         }
-        if(Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame){
+
+        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
             if (isPaused)
             {
                 ResumeGame();
@@ -169,34 +178,31 @@ public class PlayerController : MonoBehaviour
                 PauseGame();
             }
         }
+
         if (Keyboard.current.leftShiftKey.isPressed)
         {
             if (dashCounter <= 0f && dashCoolCounter <= 0f)
             {
-                m_IsDashing = true;
-                activeMoveSpeed = dashSpeed;
-
-                dashCoolCounter = dashLength;   
-                dashCounter = dashCooldown; 
-
-                _trailRenderer.emitting = true;
-
                 Vector2 dir2 = moveInput.sqrMagnitude > 0f
                     ? moveInput.normalized
                     : new Vector2(transform.right.x, transform.right.y);
 
                 m_DashDirection = new Vector3(dir2.x, dir2.y, 0f);
+
+                StartDash();
             }
         }
 
         if (dashCoolCounter > 0f)
         {
             dashCoolCounter -= Time.deltaTime;
+
+            IgnoreEnemyCollisions(true);
+
             if (dashCoolCounter <= 0f)
             {
                 dashCoolCounter = 0f;
-                m_IsDashing = false;
-                _trailRenderer.emitting = false;
+                EndDash();
             }
         }
 
@@ -209,8 +215,6 @@ public class PlayerController : MonoBehaviour
         UpdateDamages();
         AnimateBars();
     }
-
-
 
     private void FixedUpdate()
     {
@@ -235,6 +239,80 @@ public class PlayerController : MonoBehaviour
 
         rb.velocity = velocity;
     }
+
+    private void StartDash()
+    {
+        m_IsDashing = true;
+        isInvincible = true;
+        activeMoveSpeed = dashSpeed;
+
+        dashCoolCounter = dashLength;
+        dashCounter = dashCooldown;
+
+        if (_trailRenderer != null)
+            _trailRenderer.emitting = true;
+
+        IgnoreEnemyCollisions(true);
+
+        if (dashFlashCoroutine != null)
+            StopCoroutine(dashFlashCoroutine);
+
+        dashFlashCoroutine = StartCoroutine(DashFlash());
+    }
+
+    private void EndDash()
+    {
+        m_IsDashing = false;
+        isInvincible = false;
+
+        if (_trailRenderer != null)
+            _trailRenderer.emitting = false;
+
+        IgnoreEnemyCollisions(false);
+
+        if (dashFlashCoroutine != null)
+        {
+            StopCoroutine(dashFlashCoroutine);
+            dashFlashCoroutine = null;
+        }
+
+        if (sr != null)
+            sr.enabled = true;
+    }
+
+    private IEnumerator DashFlash()
+    {
+        while (isInvincible)
+        {
+            if (sr != null)
+                sr.enabled = !sr.enabled;
+
+            yield return new WaitForSeconds(flashInterval);
+        }
+
+        if (sr != null)
+            sr.enabled = true;
+    }
+
+    private void IgnoreEnemyCollisions(bool ignore)
+    {
+        if (playerCollider == null)
+            return;
+
+        EnemyScript[] enemies = FindObjectsOfType<EnemyScript>();
+
+        foreach (EnemyScript enemy in enemies)
+        {
+            if (enemy == null)
+                continue;
+
+            Collider2D enemyCollider = enemy.GetComponent<Collider2D>();
+
+            if (enemyCollider != null)
+                Physics2D.IgnoreCollision(playerCollider, enemyCollider, ignore);
+        }
+    }
+
     private void PauseGame()
     {
         VisualElement PauseMenu = uiDocument.rootVisualElement.Q<VisualElement>("PauseMenu");
@@ -249,6 +327,7 @@ public class PlayerController : MonoBehaviour
             Debug.LogError("Could not find PauseMenu in UI Document!");
         }
     }
+
     private void ResumeGame()
     {
         VisualElement PauseMenu = uiDocument.rootVisualElement.Q<VisualElement>("PauseMenu");
@@ -263,12 +342,14 @@ public class PlayerController : MonoBehaviour
             Debug.LogError("Could not find PauseMenu in UI Document!");
         }
     }
+
     public void EndScreen()
     {
         VisualElement root = uiDocument.rootVisualElement;
         VisualElement EndScreen = root.Q<VisualElement>("EndScreen");
         EndScreen.style.display = DisplayStyle.Flex;
-    }   
+    }
+
     private void SetupUI()
     {
         if (uiDocumentObject == null)
@@ -276,8 +357,6 @@ public class PlayerController : MonoBehaviour
             Debug.LogError("UI Document GameObject is not assigned!");
             return;
         }
-
-
 
         uiDocument = uiDocumentObject.GetComponent<UIDocument>();
 
@@ -292,14 +371,17 @@ public class PlayerController : MonoBehaviour
         healthBar = root.Q<ProgressBar>("HealthBar");
         xpBar = root.Q<ProgressBar>("XPBar");
         CD = root.Q<ProgressBar>("DashCooldown");
+
         VisualElement PauseMenu = root.Q<VisualElement>("PauseMenu");
         PauseMenu.style.display = DisplayStyle.None;
         PauseMenu.Q<Button>("Resume").clicked += () => ResumeGame();
         PauseMenu.Q<Button>("MainMenu").clicked += () => SceneManager.LoadScene("MainMenu");
         PauseMenu.Q<Button>("QuitGame").clicked += () => Application.Quit();
+
         VisualElement EndScreen = root.Q<VisualElement>("EndScreen");
         EndScreen.style.display = DisplayStyle.None;
-        EndScreen.Q<Button>("Restart").clicked += () => SceneManager.LoadScene(SceneManager.GetActiveScene().name);;
+        EndScreen.Q<Button>("Restart").clicked += () => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
         if (healthBar == null)
             Debug.LogError("Could not find ProgressBar named HealthBar");
 
@@ -312,9 +394,8 @@ public class PlayerController : MonoBehaviour
         displayedHealth = currentHealth;
         displayedXP = currentXP;
         displayedCD = dashCooldown - dashCounter;
-        
 
-    UpdateBarLimits();
+        UpdateBarLimits();
         ForceUpdateBars();
     }
 
@@ -331,6 +412,7 @@ public class PlayerController : MonoBehaviour
             xpBar.lowValue = 0;
             xpBar.highValue = maxXP;
         }
+
         if (CD != null)
         {
             CD.lowValue = 0;
@@ -351,6 +433,7 @@ public class PlayerController : MonoBehaviour
             xpBar.value = displayedXP;
             xpBar.title = currentXP + " / " + maxXP;
         }
+
         if (CD != null)
         {
             CD.value = displayedCD;
@@ -383,6 +466,7 @@ public class PlayerController : MonoBehaviour
             xpBar.value = displayedXP;
             xpBar.title = currentXP + " / " + maxXP;
         }
+
         if (CD != null)
         {
             displayedCD = Mathf.Lerp(
@@ -398,6 +482,9 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateDamages()
     {
+        if (isInvincible)
+            return;
+
         if (CollidingEnemies.Count == 0)
             return;
 
@@ -425,6 +512,9 @@ public class PlayerController : MonoBehaviour
 
     public void TakeDamage(int amount)
     {
+        if (isInvincible)
+            return;
+
         currentHealth -= amount;
 
         if (currentHealth <= 0)
@@ -456,6 +546,7 @@ public class PlayerController : MonoBehaviour
 
         maxXP += (maxXP + (int)(maxXP * 0.3));
         totalLevels++;
+
         if (totalLevels % levelsForWeapon == 0)
         {
             upgrades.isWeaponMode = true;
@@ -475,6 +566,7 @@ public class PlayerController : MonoBehaviour
         totalLevels = 0;
         weaponUpgradeLevels.Clear();
         weaponCount = 0;
+
         if (upgrades.weaponHolder != null)
         {
             foreach (Transform child in upgrades.weaponHolder)
@@ -482,6 +574,7 @@ public class PlayerController : MonoBehaviour
                 Destroy(child.gameObject);
             }
         }
+
         if (startingWeapon != null)
         {
             currentWeapon = startingWeapon;
@@ -489,6 +582,7 @@ public class PlayerController : MonoBehaviour
             weaponCount = 1;
             startingWeapon.Apply(this, upgrades.weaponHolder, upgrades.playerCamera, 0);
         }
+
         gameUI.ShowDeathScreen();
     }
 
@@ -497,7 +591,8 @@ public class PlayerController : MonoBehaviour
         EnemyScript enemy = collision.gameObject.GetComponent<EnemyScript>();
         XPOrb xpOrb = collision.gameObject.GetComponent<XPOrb>();
         BossBall bad = collision.gameObject.GetComponent<BossBall>();
-        if (enemy != null)
+
+        if (enemy != null && !isInvincible)
         {
             bool alreadyTracked = false;
 
@@ -521,14 +616,15 @@ public class PlayerController : MonoBehaviour
                 CollidingEnemies.Add(data);
             }
         }
+
         if (xpOrb != null)
         {
             AddXP(xpOrb.XPValue);
             Destroy(xpOrb.gameObject);
         }
-        if(bad != null)
+
+        if (bad != null && !isInvincible)
         {
-            
             TakeDamage(bad.damage);
         }
     }

@@ -10,26 +10,19 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 47c51efafa983e640b55e1e877e672ed, type: 3}
-  m_Name: Bat
+  m_Name: Spear
   m_EditorClassIdentifier: 
-  weaponName: Baseball Bat
-  description: 'A sturdy wooden bat that
-
-    swings in an arc.
-
-    Fires a baseball
-    when
-
-    upgraded further'
+  weaponName: 
+  description: 
   weapon: {fileID: 235369070727013317, guid: e5e7d8ee3b496b049980733ae31e99fb, type: 3}
-  weaponType: 0
-  fireRate: 0.5
+  weaponType: 3
+  fireRate: 3
   meleeDamage: 15
-  projectileDamage: 5
-  meleeRange: 2.5
+  projectileDamage: 1
+  meleeRange: 2
   weaponRadius: 1
   levelup: 5
-  levelUpBulletPrefab: {fileID: 7348029680949209567, guid: f83bdde8ba53b04438405bbd9cf9dcc8, type: 3}
+  levelUpBulletPrefab: {fileID: 0}
   bulletSpeed: 10
   MaxHits: 1
   bounces: 0
@@ -45,12 +38,7 @@ MonoBehaviour:
   flamethrowerFireDPS: 2
   flamethrowerFlameCount: 8
   swingAngle: 90
-  swingDuration: 0.5
-  levelsUntilRanged: 3
-  Compatibleupgrades:
-  - {fileID: 11400000, guid: c1caf9699425ae84aa02902d0d2f0949, type: 2}
-  - {fileID: 11400000, guid: e6e919bdaa05de84e97cd902ecc8ab97, type: 2}
-  - {fileID: 11400000, guid: 4781fe90ad750f24183f320ca2d75b95, type: 2}
-  - {fileID: 11400000, guid: e458d9d55a39b8e489d439e98d7b865f, type: 2}
-  - {fileID: 11400000, guid: d651d5416bd95004a981d4a459e38810, type: 2}
+  swingDuration: 4
+  levelsUntilRanged: 5
+  Compatibleupgrades: []
   FlamethrowerUpgrades: []

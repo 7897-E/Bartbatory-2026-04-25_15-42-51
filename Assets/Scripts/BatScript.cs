@@ -3,31 +3,37 @@ using System.Collections.Generic;
 
 public class BatScript : MonoBehaviour
 {
-    public enum WeaponType { Bat, Minigun, Shotgun }
+    public enum WeaponType { Bat, Minigun, Shotgun, Spear }
+
     [Header("References")]
-    public Transform batPivot;     
-    public Transform firePoint;    
+    public Transform batPivot;
+    public Transform firePoint;
 
     [Header("Rotation / Aim")]
     public float rotationSpeed = 720f;
+
     [Header("Bullet")]
     public Baseball bulletPrefab;
     public Baseball levelUpBulletPrefabObject;
     public Camera cam;
     public int currentLevel = 0;
-    public float meleeOffsetDistance = 1.5f;   
+    public float meleeOffsetDistance = 1.5f;
     public LayerMask enemyLayer;
+
     [Header("Movement bat only")]
-    public float batMoveSpeed = 10f;  
+    public float batMoveSpeed = 10f;
+
     [Header("Weapon Type Inherited")]
     public WeaponType weaponType = WeaponType.Bat;
     public int levelup = 5;
+
     [Header("Firing inherited")]
     public float fireRate = 0.3f;
     private float fireCooldown = 0f;
     public int meleeDamage = 1;
     public int projectileDamage = 1;
-    public float meleeRange = 1f;
+    public float meleeRange = 2f;
+
     [Header("Bullet inherited")]
     public float bulletSpeed = 10f;
     public int MaxHits = 1;
@@ -49,17 +55,26 @@ public class BatScript : MonoBehaviour
     public int flamethrowerFlameCount = 8;
     private float flamethrowerCooldown = 0f;
 
-    [Header("Swing (Bat only) inherited")]
-    public float swingAngle = 90f;
+    [Header("Swing Bat")]
+    public float swingAngle = 110f;
     public float swingDuration = 0.15f;
     private bool isSwinging = false;
     private float swingTimer = 0f;
     private float startAngle;
     public int levelsUntilRanged = 5;
 
-     
+    [Header("Spear")]
+    public float spearStabDistance = 1.5f;
+    public float spearStabDuration = 0.2f;
+    public float spearHitRadius = 0.8f;
+    public float spearDamageMultiplier = 2f;
+    private bool isStabbing = false;
+    private float spearTimer = 0f;
+    private Vector3 spearBaseLocalPosition;
+    private Vector3 spearDirection;
+    private bool spearHitThisStab;
 
-    [Header("Side Offset (relative to player)")]
+    [Header("Side Offset relative to player")]
     public Vector3 rightOffset = new Vector3(0f, 0f, 0f);
     public Vector3 leftOffset = new Vector3(0f, 0f, 0f);
 
@@ -72,7 +87,7 @@ public class BatScript : MonoBehaviour
     private void Awake()
     {
         player = transform.parent;
-        
+
         if (batPivot == null)
             batPivot = transform;
     }
@@ -80,14 +95,16 @@ public class BatScript : MonoBehaviour
     private void Update()
     {
         EnemyScript nearestEnemy = FindNearestEnemy();
-        
+
         if (nearestEnemy != currentTarget)
         {
             if (currentTarget != null && weaponTargets.ContainsKey(this) && weaponTargets[this] == currentTarget)
             {
                 weaponTargets.Remove(this);
             }
+
             currentTarget = nearestEnemy;
+
             if (currentTarget != null)
             {
                 weaponTargets[this] = currentTarget;
@@ -96,49 +113,72 @@ public class BatScript : MonoBehaviour
 
         if (nearestEnemy != null)
         {
-            if(currentLevel < levelsUntilRanged)
+            if ((weaponType == WeaponType.Bat && !isSwinging) || (weaponType == WeaponType.Spear && !isStabbing))
+            {
                 UpdateSide(nearestEnemy.transform.position);
-                AimAt(nearestEnemy.transform.position);
-                FireAt(nearestEnemy.transform.position);
+            }
 
+            if (!isSwinging && !isStabbing)
+            {
+                AimAt(nearestEnemy.transform.position);
+            }
+
+            FireAt(nearestEnemy.transform.position);
         }
-        
         else
         {
             if (weaponTargets.ContainsKey(this))
             {
                 weaponTargets.Remove(this);
             }
+
             currentTarget = null;
         }
-        if(currentLevel >= levelup){
-        nearestEnemy = FindNearestEnemy();
-        
-        if (nearestEnemy != currentTarget)
+
+        if (currentLevel >= levelup)
         {
-            if (currentTarget != null && weaponTargets.ContainsKey(this) && weaponTargets[this] == currentTarget)
+            nearestEnemy = FindNearestEnemy();
+
+            if (nearestEnemy != currentTarget)
             {
-                weaponTargets.Remove(this);
+                if (currentTarget != null && weaponTargets.ContainsKey(this) && weaponTargets[this] == currentTarget)
+                {
+                    weaponTargets.Remove(this);
+                }
+
+                currentTarget = nearestEnemy;
+
+                if (currentTarget != null)
+                {
+                    weaponTargets[this] = currentTarget;
+                }
             }
-            currentTarget = nearestEnemy;
-            if (currentTarget != null)
+
+            if (nearestEnemy != null)
             {
-                weaponTargets[this] = currentTarget;
-            }
-        }
-            if (nearestEnemy != null){
-                if(currentLevel < levelsUntilRanged)
+                if ((weaponType == WeaponType.Bat && !isSwinging) || (weaponType == WeaponType.Spear && !isStabbing))
+                {
                     UpdateSide(nearestEnemy.transform.position);
+                }
+
+                if (!isSwinging && !isStabbing)
+                {
                     AimAt(nearestEnemy.transform.position);
-                    FireUp(nearestEnemy.transform.position);
+                }
+
+                FireUp(nearestEnemy.transform.position);
             }
         }
+
         if (weaponType == WeaponType.Bat)
         {
             UpdateSwing();
         }
 
-        
+        if (weaponType == WeaponType.Spear)
+        {
+            UpdateSpearStab();
+        }
     }
 
     private void AimAt(Vector3 targetPos)
@@ -157,7 +197,9 @@ public class BatScript : MonoBehaviour
     private EnemyScript FindNearestEnemy()
     {
         EnemyScript[] enemies = FindObjectsOfType<EnemyScript>();
-        if (enemies.Length == 0) return null;
+
+        if (enemies.Length == 0)
+            return null;
 
         EnemyScript nearest = null;
         float nearestDistSqr = float.MaxValue;
@@ -165,10 +207,14 @@ public class BatScript : MonoBehaviour
 
         foreach (var enemy in enemies)
         {
-            if (enemy == null) continue;
-            if (weaponTargets.ContainsValue(enemy)) continue;
+            if (enemy == null)
+                continue;
+
+            if (weaponTargets.ContainsValue(enemy))
+                continue;
 
             float distSqr = (enemy.transform.position - currentPos).sqrMagnitude;
+
             if (distSqr < nearestDistSqr)
             {
                 nearestDistSqr = distSqr;
@@ -180,59 +226,74 @@ public class BatScript : MonoBehaviour
     }
 
     private void FireAt(Vector3 targetPos)
-
     {
         if (fireCooldown > 0f)
         {
-            fireCooldown -= Time.deltaTime;       
-            return; 
-        }        
+            fireCooldown -= Time.deltaTime;
+            return;
+        }
+
         switch (weaponType)
         {
             case WeaponType.Bat:
-                if ( currentLevel >= levelsUntilRanged)
-                {
-                        StartSwing(targetPos);
-                       FireBullet(targetPos);
-                }
-
-                if (!isSwinging && IsEnemyInMeleeRange())
+                if (!isSwinging)
                 {
                     StartSwing(targetPos);
                 }
+
+                if (currentLevel >= levelsUntilRanged)
+                {
+                    FireBullet(targetPos);
+                }
+
                 break;
+
             case WeaponType.Minigun:
                 FireBullet(targetPos);
                 break;
+
             case WeaponType.Shotgun:
-                if(currentLevel >= levelup){
-                    FireShotgun(targetPos);
-                }else{
-                    FireShotgun(targetPos);
+                FireShotgun(targetPos);
+                break;
+
+            case WeaponType.Spear:
+                if (!isStabbing)
+                {
+                    StartSpearStab(targetPos);
                 }
                 break;
         }
-        
+
         fireCooldown = fireRate;
     }
 
     private void FireUp(Vector3 targetPos)
     {
-        if (flamethrowerCooldown > 0f) {flamethrowerCooldown-= Time.deltaTime;return;}
+        if (flamethrowerCooldown > 0f)
+        {
+            flamethrowerCooldown -= Time.deltaTime;
+            return;
+        }
 
         switch (weaponType)
         {
             case WeaponType.Bat:
                 break;
+
             case WeaponType.Minigun:
                 break;
+
             case WeaponType.Shotgun:
                 FireFlames(targetPos);
+                break;
+
+            case WeaponType.Spear:
                 break;
         }
 
         flamethrowerCooldown = flamethrowerFireRate;
     }
+
     private void FireBullet(Vector3 targetPos)
     {
         Transform spawnTransform = firePoint != null ? firePoint : batPivot;
@@ -247,8 +308,6 @@ public class BatScript : MonoBehaviour
 
         bullet.Init(dir, projectileDamage, bulletSpeed, MaxHits, bounces, cam, false, 0);
     }
- 
-        
 
     private void FireShotgun(Vector3 targetPos)
     {
@@ -257,8 +316,8 @@ public class BatScript : MonoBehaviour
 
         for (int i = 0; i < shotgunPellets; i++)
         {
-            float angleOffset = Random.Range(-shotgunSpread / 2f, shotgunSpread / 2f) * Mathf.Deg2Rad;
-            Vector3 dir = Quaternion.Euler(0, 0, angleOffset * Mathf.Rad2Deg) * baseDir;
+            float angleOffset = Random.Range(-shotgunSpread / 2f, shotgunSpread / 2f);
+            Vector3 dir = Quaternion.Euler(0, 0, angleOffset) * baseDir;
 
             Baseball bullet = Instantiate(
                 bulletPrefab,
@@ -269,6 +328,7 @@ public class BatScript : MonoBehaviour
             bullet.Init(dir, projectileDamage, bulletSpeed, MaxHits, bounces, cam, true, ShotgunRange);
         }
     }
+
     private void FireFlames(Vector3 targetPos)
     {
         Transform spawnTransform = firePoint != null ? firePoint : batPivot;
@@ -286,8 +346,8 @@ public class BatScript : MonoBehaviour
 
         for (int i = 0; i < flamethrowerFlameCount; i++)
         {
-            float angleOffset = Random.Range(-flamethrowerSpread / 2f, flamethrowerSpread / 2f) * Mathf.Deg2Rad;
-            Vector3 dir = Quaternion.Euler(0, 0, angleOffset * Mathf.Rad2Deg) * baseDir;
+            float angleOffset = Random.Range(-flamethrowerSpread / 2f, flamethrowerSpread / 2f);
+            Vector3 dir = Quaternion.Euler(0, 0, angleOffset) * baseDir;
 
             Baseball bullet = Instantiate(
                 prefabToUse,
@@ -301,82 +361,181 @@ public class BatScript : MonoBehaviour
                 continue;
             }
 
-            bullet.Init(dir, flamethrowerDamage, flamethrowerSpeed, MaxHits, bounces, cam, true, flamethrowerRange, true, true, flamethrowerFireDuration, flamethrowerFireDPS);
+            bullet.Init(
+                dir,
+                flamethrowerDamage,
+                flamethrowerSpeed,
+                MaxHits,
+                bounces,
+                cam,
+                true,
+                flamethrowerRange,
+                true,
+                true,
+                flamethrowerFireDuration,
+                flamethrowerFireDPS
+            );
         }
     }
 
-    
-
     private void UpdateSide(Vector3 targetPos)
     {
-    if (player == null || isSwinging) return;
+        if (player == null)
+            return;
 
-    Vector3 dir = (targetPos - player.position).normalized;
-    Vector3 targetLocalPos = dir * meleeOffsetDistance;
+        Vector3 dir = (targetPos - player.position).normalized;
+        Vector3 targetLocalPos = dir * meleeOffsetDistance;
 
-    batPivot.localPosition = Vector3.MoveTowards(
-        batPivot.localPosition,
-        targetLocalPos,
-        batMoveSpeed * Time.deltaTime
-    );
+        batPivot.localPosition = Vector3.MoveTowards(
+            batPivot.localPosition,
+            targetLocalPos,
+            batMoveSpeed * Time.deltaTime
+        );
     }
-private void StartSwing(Vector3 targetPos)
-{
-    isSwinging = true;
-    swingTimer = 0f;
-    meleeHitThisSwing = false;
 
-    Vector3 dir = (targetPos - batPivot.position).normalized;
-    float angleToTarget = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-    startAngle = angleToTarget;
-}
-
-private void UpdateSwing()
-{
-    if (!isSwinging) return;
-
-    swingTimer += Time.deltaTime;
-    float t = swingTimer / swingDuration;
-
-    if (t >= 1f)
+    private void StartSwing(Vector3 targetPos)
     {
-        isSwinging = false;
+        isSwinging = true;
+        swingTimer = 0f;
         meleeHitThisSwing = false;
-        return;
+
+        Vector3 dir = (targetPos - batPivot.position).normalized;
+        float angleToTarget = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+
+        startAngle = angleToTarget;
     }
 
-    if (!meleeHitThisSwing && t >= 0.4f)
-        PerformMeleeHit();
-
-    float curve = Mathf.Sin(t * Mathf.PI);
-
-    float currentAngle = startAngle + swingAngle * (curve - 0.5f);
-
-    batPivot.rotation = Quaternion.Euler(0f, 0f, currentAngle);
-}
-private bool IsEnemyInMeleeRange()
-{
-    int mask = enemyLayer.value;
-    if (mask == 0)
-        mask = Physics2D.DefaultRaycastLayers;
-
-    Collider2D hit = Physics2D.OverlapCircle(batPivot.position, meleeRange, mask);
-    return hit != null && hit.GetComponent<EnemyScript>() != null;
-}
-    private void PerformMeleeHit()
+    private void UpdateSwing()
     {
-        meleeHitThisSwing = true;
+        if (!isSwinging)
+            return;
+
+        swingTimer += Time.deltaTime;
+        float t = swingTimer / swingDuration;
+
+        if (t >= 1f)
+        {
+            isSwinging = false;
+            meleeHitThisSwing = false;
+            return;
+        }
+
+        if (!meleeHitThisSwing && t >= 0.4f)
+        {
+            PerformMeleeHit();
+        }
+
+        float curve = Mathf.Sin(t * Mathf.PI);
+        float currentAngle = startAngle + swingAngle * (curve - 0.5f);
+
+        batPivot.rotation = Quaternion.Euler(0f, 0f, currentAngle);
+    }
+
+    private void StartSpearStab(Vector3 targetPos)
+    {
+        isStabbing = true;
+        spearTimer = 0f;
+        spearHitThisStab = false;
+        spearBaseLocalPosition = batPivot.localPosition;
+
+        Vector3 dir = (targetPos - batPivot.position).normalized;
+        spearDirection = dir;
+
+        float angleToTarget = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        batPivot.rotation = Quaternion.Euler(0f, 0f, angleToTarget);
+    }
+
+    private void UpdateSpearStab()
+    {
+        if (!isStabbing)
+            return;
+
+        spearTimer += Time.deltaTime;
+        float t = spearTimer / spearStabDuration;
+
+        if (t >= 1f)
+        {
+            isStabbing = false;
+            spearHitThisStab = false;
+            batPivot.localPosition = spearBaseLocalPosition;
+            return;
+        }
+
+        float stabCurve = Mathf.Sin(t * Mathf.PI);
+        batPivot.localPosition = spearBaseLocalPosition + spearDirection * spearStabDistance * stabCurve;
+
+        if (!spearHitThisStab && t >= 0.45f)
+        {
+            PerformSpearHit();
+        }
+    }
+
+    private void PerformSpearHit()
+    {
+        spearHitThisStab = true;
 
         int layerMask = enemyLayer.value;
+
         if (layerMask == 0)
         {
             layerMask = Physics2D.DefaultRaycastLayers;
         }
 
-        Collider2D[] hits = Physics2D.OverlapCircleAll(batPivot.position, meleeRange, layerMask);
+        Vector3 spearTip = batPivot.position + spearDirection * spearStabDistance;
+
+        Collider2D[] hits = Physics2D.OverlapCircleAll(
+            spearTip,
+            spearHitRadius,
+            layerMask
+        );
+
         foreach (var hit in hits)
         {
             EnemyScript enemy = hit.GetComponent<EnemyScript>();
+
+            if (enemy != null)
+            {
+                int spearDamage = Mathf.Max(1, Mathf.RoundToInt(meleeDamage * spearDamageMultiplier));
+                enemy.TakeDamage(spearDamage);
+            }
+        }
+    }
+
+    private bool IsEnemyInMeleeRange()
+    {
+        int mask = enemyLayer.value;
+
+        if (mask == 0)
+        {
+            mask = Physics2D.DefaultRaycastLayers;
+        }
+
+        Collider2D hit = Physics2D.OverlapCircle(batPivot.position, meleeRange, mask);
+
+        return hit != null && hit.GetComponent<EnemyScript>() != null;
+    }
+
+    private void PerformMeleeHit()
+    {
+        meleeHitThisSwing = true;
+
+        int layerMask = enemyLayer.value;
+
+        if (layerMask == 0)
+        {
+            layerMask = Physics2D.DefaultRaycastLayers;
+        }
+
+        Collider2D[] hits = Physics2D.OverlapCircleAll(
+            batPivot.position,
+            meleeRange,
+            layerMask
+        );
+
+        foreach (var hit in hits)
+        {
+            EnemyScript enemy = hit.GetComponent<EnemyScript>();
+
             if (enemy != null)
             {
                 enemy.TakeDamage(meleeDamage);

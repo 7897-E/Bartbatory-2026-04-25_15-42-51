@@ -25,9 +25,9 @@ Transform:
   m_GameObject: {fileID: 235369070727013317}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.35, y: -0.2, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1049249187634044926}
   m_Father: {fileID: 0}
@@ -133,6 +133,7 @@ MonoBehaviour:
   firePoint: {fileID: 1049249187634044926}
   rotationSpeed: 720
   bulletPrefab: {fileID: 7348029680949209567, guid: f83bdde8ba53b04438405bbd9cf9dcc8, type: 3}
+  levelUpBulletPrefabObject: {fileID: 0}
   cam: {fileID: 0}
   currentLevel: 0
   meleeOffsetDistance: 1
@@ -141,6 +142,7 @@ MonoBehaviour:
     m_Bits: 1
   batMoveSpeed: 10
   weaponType: 0
+  levelup: 5
   fireRate: 0.3
   meleeDamage: 1
   projectileDamage: 1
@@ -151,6 +153,14 @@ MonoBehaviour:
   shotgunPellets: 5
   shotgunSpread: 30
   ShotgunRange: 10
+  flamethrowerDamageMultiplier: 0.4
+  flamethrowerFireRate: 0.1
+  flamethrowerSpeedMultiplier: 0.8
+  flamethrowerSpread: 25
+  flamethrowerRange: 8
+  flamethrowerFireDuration: 3
+  flamethrowerFireDPS: 2
+  flamethrowerFlameCount: 8
   swingAngle: 90
   swingDuration: 0.15
   levelsUntilRanged: 1
